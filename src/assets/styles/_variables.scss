@@ -1,0 +1,65 @@
+// Couleurs
+$couleur-fond: #0A0F15;
+$couleur-carte: #373E4E;
+$couleur-btn: #F96750;
+$couleur-texte: #FFFFFF;
+
+// Espacements
+$padding-page: 24px 16px;
+$gap-cards: 16px;
+$border-radius: 12px;
+
+// Typographie
+$font-size-base: 0.95rem;
+$font-size-titre: 1.4rem;
+$font-size-sous-titre: 1rem;
+
+
+.accueil {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 16px;
+  min-height: 100vh;
+  background-color: $couleur-fond;
+  color: white;
+}
+
+h1 {
+  text-align: center;
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+
+h2 {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.card {
+  background-color: $couleur-carte;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 0.95rem;
+}
+
+.card.production {
+  font-weight: 500;
+}
+
+.btn {
+  margin-top: auto;
+  background-color: #3a6b5e;
+  color: white;
+  text-align: center;
+  padding: 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1rem;
+}
+.accueil {
+  min-height: 100vh;
+  box-sizing: border-box;
+}

@@ -18,13 +18,13 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useApi } from '@/composables/useApi'
 
 const props = defineProps(['data'])
 defineEmits(['prev'])
 
-const loading = ref(true)
+const { loading, error, fetchApi } = useApi()
 const result = ref(null)
-const error = ref('')
 
 const transportLabel = computed(() => {
   const labels = {
@@ -38,23 +38,13 @@ const transportLabel = computed(() => {
 
 onMounted(async () => {
   try {
-    const url = `https://impactco2.fr/api/v1/transport?km=${props.data.km}&transportations=${props.data.transport}`
-    const res = await fetch(url)
-
-    if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`)
-
-    const json = await res.json()
-
-    // L'API retourne un tableau "data" avec les transports
-    // Chaque entrée a un champ "value" en kg CO2e
+    const json = await fetchApi(
+      `/transport?km=${props.data.km}&transportations=${props.data.transport}`
+    )
     const item = json.data?.[0]
     result.value = item ? (item.value / 1000).toFixed(3) : '—'
-    // ⚠️ valeur en g CO₂e → diviser par 1000 pour avoir kg
   } catch (e) {
-    error.value = 'Impossible de récupérer les données. Réessayez.'
-    console.error(e)
-  } finally {
-    loading.value = false
+    // error est déjà géré par useApi
   }
 })
 </script>

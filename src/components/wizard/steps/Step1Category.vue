@@ -27,7 +27,6 @@ const emit = defineEmits(['next'])
 const categories = [
   { value: 'transport', label: 'Transport', icon: '🚗' },
   { value: 'repas',     label: 'Repas',     icon: '🍽️' },
-  { value: 'achat',     label: 'Achat',     icon: '🛍️' },
 ]
 
 const local = reactive({ category: props.data.category ?? null })

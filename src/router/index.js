@@ -3,9 +3,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    {
+     {
       path: '/',
-      redirect: '/calculateur'   // ← redirige automatiquement vers le wizard
+      name: 'accueil',
+      component: () => import('@/views/AccueilView.vue')
     },
     {
       path: '/calculateur',
