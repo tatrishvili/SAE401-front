@@ -1,7 +1,7 @@
 <template>
-  <WizardForm />
+  <CalculateurWizard />
 </template>
 
 <script setup>
-import WizardForm from '@/components/wizard/WizardForm.vue'
+import CalculateurWizard from '@/components/WizardForm.vue'
 </script>

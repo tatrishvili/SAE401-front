@@ -1,25 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// Import des vues (lazy loading)
-const HomeView = () => import('../views/Home.vue')
+// Lazy-loaded components
+const HomeView = () => import('../views/AccueilView.vue')       // <-- fix path
 const CalculatorView = () => import('../views/CalculateurView.vue')
 
 const routes = [
     {
         path: '/',
         name: 'home',
-        component: HomeView
+        component: HomeView,       // <-- use the lazy-loaded variable
     },
     {
         path: '/calculateur',
         name: 'calculator',
-        component: CalculatorView
-    }
+        component: CalculatorView, // <-- use the lazy-loaded variable
+    },
 ]
 
 const router = createRouter({
     history: createWebHistory(),
-    routes
+    routes,
 })
 
 export default router

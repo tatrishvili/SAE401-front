@@ -1,5 +1,5 @@
+// src/composables/UseApi.js
 import { ref } from 'vue'
-
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://symfony.mmi-troyes.fr:8319/api'
 
