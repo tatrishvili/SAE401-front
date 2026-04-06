@@ -18,7 +18,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useApi } from '@/composables/useApi'
+import { useApi } from '@/composables/UseApi'
 
 const props = defineProps(['data'])
 defineEmits(['prev'])

@@ -1,18 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import WelcomeView from '@/views/WelcomeView.vue'
+import AccueilView from '@/views/AccueilView.vue'
+import ConnexionView from '@/views/ConnexionView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-     {
-      path: '/',
-      name: 'accueil',
-      component: () => import('@/views/AccueilView.vue')
-    },
-    {
-      path: '/calculateur',
-      name: 'calculateur',
-      component: () => import('@/views/CalculateurView.vue')
-    }
+    { path: '/', component: WelcomeView },
+    { path: '/connexion', component: ConnexionView },
+    { path: '/home', component: AccueilView },
+    { path: '/calculateur', component: () => import('@/views/CalculateurView.vue') },
   ]
 })
 
