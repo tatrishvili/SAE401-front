@@ -7,12 +7,22 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
-.DS_Store
 dist
 dist-ssr
 coverage
 *.local
+
+# --- BLOCK BACK-END (SYMFONY) ---
+# Empêche les fichiers du back de polluer le repo front
+vendor/
+composer.json
+composer.lock
+.env
+.env.*
+!.env.example
+# --------------------------------
 
 # Editor directories and files
 .vscode/*
@@ -23,16 +33,15 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+.DS_Store
 
+# Misc
 *.tsbuildinfo
-
 .eslintcache
 
-# Cypress
+# Cypress & Vitest
 /cypress/videos/
 /cypress/screenshots/
-
-# Vitest
 __screenshots__/
 
 # Vite
