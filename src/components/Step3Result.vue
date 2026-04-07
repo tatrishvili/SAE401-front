@@ -45,7 +45,6 @@ const transportLabel = computed(() => {
 
 onMounted(async () => {
   try {
-    // "transports" is the correct parameter name expected by the Symfony controller
     const json = await fetchApi(
         `/transport?km=${props.data.km}&transports=${props.data.transportId}`
     )
