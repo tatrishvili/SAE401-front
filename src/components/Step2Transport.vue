@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="step step2">
     <h2>Votre trajet</h2>
 
     <!-- 1. Choix du transport -->
@@ -16,7 +16,7 @@
     <span class="error" v-if="errors.transport">{{ errors.transport }}</span>
 
     <!-- 2. Distance -->
-    <div>
+    <div class="inpuuut">
       <label>Distance (km)</label>
       <input
           v-model.number="local.km"
@@ -27,8 +27,8 @@
       <span class="error" v-if="errors.km">{{ errors.km }}</span>
     </div>
 
-    <button @click="$emit('prev')">← Retour</button>
-    <button @click="handleNext">Calculer →</button>
+    <button @click="$emit('prev')" class="disparait">← Retour</button>
+    <button @click="handleNext" class="suivant">Calculer</button>
   </div>
 </template>
 
@@ -66,8 +66,8 @@ const handleNext = () => {
 
 <style scoped>
 button.selected {
-  background: #22c55e;
-  color: white;
-  border-color: #22c55e;
+  background: #8792A4;
+  color: #373E4E;
+  border-color: #8792A4;
 }
 </style>

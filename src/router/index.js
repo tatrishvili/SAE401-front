@@ -1,25 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
-// Lazy-loaded components
-const HomeView = () => import('../views/AccueilView.vue')       // <-- fix path
-const CalculatorView = () => import('../views/CalculateurView.vue')
-
-const routes = [
-    {
-        path: '/',
-        name: 'home',
-        component: HomeView,       // <-- use the lazy-loaded variable
-    },
-    {
-        path: '/calculateur',
-        name: 'calculator',
-        component: CalculatorView, // <-- use the lazy-loaded variable
-    },
-]
+import WelcomeView from '@/views/WelcomeView.vue'
+import AccueilView from '@/views/AccueilView.vue'
+import ConnexionView from '@/views/ConnexionView.vue'
+import ConseilsView from '@/views/ConseilsView.vue'
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes,
+  history: createWebHistory(),
+  routes: [
+    { path: '/', component: WelcomeView },
+    { path: '/connexion', component: ConnexionView },
+    { path: '/home', component: AccueilView, name: 'Accueil'},
+    { path: '/conseils', component: ConseilsView },
+    { path: '/calculateur', component: () => import('@/views/CalculateurView.vue'), name:'Action' },
+    { path: '/profil', component: () => import('@/views/ProfilView.vue'), name:'Profil' },
+  ]
 })
 
 export default router
