@@ -1,14 +1,20 @@
 <template>
   <div id="app">
-    <RouterLink to="/calculateur">Calculer mon empreinte</RouterLink>
-    <RouterLink to="/">Home</RouterLink>
-    <RouterView />
+    <!-- Header -->
+    <Header />
+
+    <!-- Contenu principal -->
+    <main>
+      <RouterView />
+    </main>
+
+    <!-- Footer -->
+    <Footer />
   </div>
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
 </script>
-
-<style>
-</style>

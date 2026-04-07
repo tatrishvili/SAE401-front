@@ -1,9 +1,11 @@
 <template>
   <div class="accueil">
-    <h1>Accueil</h1>
 
     <div class="card production">
-      <p>Production quotidienne : <span>-- kg CO2</span></p>
+      <h2>Production quotidienne : <span>-- kg CO2</span></h2>
+    </div>
+
+    <div class="card graphique">
     </div>
 
     <div class="card defi">
@@ -36,6 +38,6 @@ const conseils = [
 const conseilDuJour = ref(conseils[Math.floor(Math.random() * conseils.length)])
 </script>
 
-<style lang="scss">
-@use "@/assets/styles/_variables.scss" as *;
+<style lang="css">
+@use "@/assets/styles/style.css" as *;
 </style>
