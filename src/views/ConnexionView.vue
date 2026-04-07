@@ -11,9 +11,13 @@
             type="email"
             placeholder="E-Mail"
             class="input"
+            :class="{ 'input-error': submitted && !emailValide }"
             autocomplete="email"
           />
         </div>
+        <p v-if="submitted && !emailValide" class="error-msg">
+          Adresse e-mail invalide.
+        </p>
 
         <!-- Mot de passe -->
         <div class="input-wrapper">
@@ -22,6 +26,7 @@
             :type="showPassword ? 'text' : 'password'"
             placeholder="Mot de passe"
             class="input"
+            :class="{ 'input-error': submitted && !passwordValide }"
             autocomplete="current-password"
           />
           <button class="toggle-password" @click="showPassword = !showPassword" tabindex="-1">
@@ -36,6 +41,9 @@
             </svg>
           </button>
         </div>
+        <p v-if="submitted && !passwordValide" class="error-msg">
+          Min. 5 caractères, une majuscule, une minuscule et un caractère spécial.
+        </p>
 
         <!-- Mot de passe oublié -->
         <div class="forgot-row">
@@ -77,27 +85,44 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
+const submitted = ref(false)
+
+const emailValide = computed(() => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
+})
+
+
+
+const passwordValide = computed(() => {
+  const v = password.value
+  return (
+    v.length >= 5 &&
+    /[a-z]/.test(v) &&
+    /[A-Z]/.test(v) &&
+    /[^a-zA-Z0-9]/.test(v)
+  )
+})
+
+const formValide = computed(() => emailValide.value && passwordValide.value)
 
 function handleLogin() {
-  // TODO: logique d'authentification
+  submitted.value = true
+  if (!formValide.value) return
   router.push('/home')
 }
 
 function handleEmailSignup() {
-  // TODO: inscription par e-mail
-}
-
-function handleAppleSignup() {
-  // TODO: inscription Apple
-}
+  router.push('/inscription')
+}  
 </script>
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
@@ -122,7 +147,6 @@ function handleAppleSignup() {
   animation: fadeUp 0.5s ease both;
 }
 
-/* Title */
 .title {
   font-size: 1.9rem;
   font-weight: 800;
@@ -131,7 +155,6 @@ function handleAppleSignup() {
   margin: 0 0 8px;
 }
 
-/* Form */
 .form {
   display: flex;
   flex-direction: column;
@@ -147,7 +170,7 @@ function handleAppleSignup() {
 .input {
   width: 100%;
   background-color: #2a3242;
-  border: none;
+  border: 1.5px solid transparent;
   border-radius: 14px;
   padding: 16px 20px;
   font-family: 'Nunito', sans-serif;
@@ -155,7 +178,7 @@ function handleAppleSignup() {
   color: #ffffff;
   outline: none;
   box-sizing: border-box;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .input::placeholder {
@@ -164,6 +187,17 @@ function handleAppleSignup() {
 
 .input:focus {
   background-color: #313d52;
+  border-color: #3a4f6a;
+}
+
+.input-error {
+  border-color: #f07050 !important;
+}
+
+.error-msg {
+  color: #f07050;
+  font-size: 0.78rem;
+  margin: -8px 0 0 4px;
 }
 
 .toggle-password {
@@ -188,7 +222,6 @@ function handleAppleSignup() {
   height: 20px;
 }
 
-/* Forgot */
 .forgot-row {
   display: flex;
   justify-content: flex-end;
@@ -206,7 +239,6 @@ function handleAppleSignup() {
   color: #ffffff;
 }
 
-/* Connexion button */
 .connexion-btn {
   background-color: #f07050;
   color: #ffffff;
@@ -233,7 +265,6 @@ function handleAppleSignup() {
   transform: translateY(1px);
 }
 
-/* Separator */
 .separator {
   display: flex;
   align-items: center;
@@ -253,7 +284,6 @@ function handleAppleSignup() {
   white-space: nowrap;
 }
 
-/* Social buttons */
 .social-buttons {
   display: flex;
   flex-direction: column;
@@ -297,7 +327,6 @@ function handleAppleSignup() {
   height: 18px;
 }
 
-/* Animation */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
