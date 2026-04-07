@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="step step3">
     <h2>Résultat</h2>
 
-    <div v-if="loading">⏳ Calcul en cours...</div>
+    <div v-if="loading">Calcul en cours...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else-if="result !== null">
       <p>
@@ -12,13 +12,13 @@
       <p class="result">🌍 {{ result }} kg CO₂e</p>
     </div>
 
-    <button @click="$emit('prev')">← Retour</button>
+    <button @click="$emit('prev')" class="suivant">← Retour</button>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useApi } from '@/composables/UseApi'
+import { useApi } from '@/composables/useApi'
 
 const props = defineProps(['data'])
 defineEmits(['prev'])

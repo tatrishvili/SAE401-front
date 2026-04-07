@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="step step1">
     <h2>Que souhaitez-vous calculer ?</h2>
 
     <div class="choices">
@@ -14,7 +14,7 @@
     </div>
     <span class="error" v-if="error">{{ error }}</span>
 
-    <button @click="handleNext">Suivant →</button>
+    <button @click="handleNext" class="suivant">Suivant →</button>
   </div>
 </template>
 
@@ -44,8 +44,8 @@ const handleNext = () => {
 
 <style scoped>
 button.selected {
-  background: #22c55e;
-  color: white;
-  border-color: #22c55e;
+  background: #8792A4;
+  color: #373E4E;
+  border-color: #8792A4;
 }
 </style>
