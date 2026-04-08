@@ -12,6 +12,31 @@
       </div>
     </Transition>
 
+    <Transition name="badge-pop">
+      <div v-if="showBadgeCelebration" class="reward-overlay" @click.self="closeBadgeCelebration">
+        <div class="reward-popup badge-celebration-popup" role="dialog" aria-modal="true">
+          <p class="reward-kicker">Nouveau badge</p>
+          <h2>Félicitations !</h2>
+          <div class="reward-badge-frame">
+            <img
+              v-if="celebrationBadge"
+              class="reward-badge-image"
+              :src="celebrationBadge.image"
+              :alt="celebrationBadge.name"
+            />
+          </div>
+          <p v-if="celebrationBadge">
+            Tu viens de débloquer <strong>{{ celebrationBadge.name }}</strong
+            >.
+          </p>
+          <p v-if="celebrationBadgeCount > 1" class="reward-subtext">
+            {{ celebrationBadgeCount }} nouveaux badges viennent de s’ajouter à ta collection.
+          </p>
+          <button type="button" class="reward-btn" @click="closeBadgeCelebration">Continuer</button>
+        </div>
+      </div>
+    </Transition>
+
     <header class="header">
       <h1>Mon Parcours Éco</h1>
       <div class="stats">
@@ -37,12 +62,19 @@
           :class="{
             locked: !step.isUnlocked,
             completed: step.isCompleted,
+            treasure: isTreasureStep(step.position),
           }"
           :style="{ transform: `translateX(${calculateOffset(index)}px)` }"
           @click="handleStepClick(step)"
         >
           <div class="node-circle">
-            <span class="step-number">{{ step.position }}</span>
+            <img
+              v-if="isTreasureStep(step.position)"
+              :src="treasureIcon"
+              alt="Jour tresor"
+              class="treasure-icon"
+            />
+            <span v-else class="step-number">{{ step.position }}</span>
             <span v-if="!step.isUnlocked" class="lock-icon">🔒</span>
             <span v-if="step.isCompleted" class="check-icon">✓</span>
           </div>
@@ -66,16 +98,22 @@
 import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import api from '../services/api'
+import treasureIcon from '@/assets/images/tresor.png'
+import { mergeXpWithLocal } from '../services/xpLocal'
+import { DEFAULT_BADGE_CATALOG, getUnlockedBadgesFromXp } from '@/services/badges'
 
 const steps = ref([])
 const router = useRouter()
 const route = useRoute()
 const hasNewBadges = ref(false)
 const currentUnlockedBadges = ref(0)
+const showBadgeCelebration = ref(false)
+const celebrationBadge = ref(null)
+const celebrationBadgeCount = ref(0)
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
 const BADGE_SEEN_KEY = 'seenUnlockedBadgesCount'
-const BADGES_THRESHOLDS = [25, 60, 100, 180, 260, 400]
+const BADGES_THRESHOLDS = DEFAULT_BADGE_CATALOG.map((badge) => badge.xpRequired)
 const SCROLL_DURATION = 480
 const SCROLL_TOP_THRESHOLD = 240
 
@@ -89,6 +127,7 @@ let scrollRafId = null
 
 const unlockedCount = computed(() => steps.value.filter((s) => s.isUnlocked).length)
 const calculateOffset = (index) => Math.sin(index * 1.0) * 60
+const isTreasureStep = (position) => Number(position) === 1 || Number(position) % 5 === 0
 
 const easeOutCubic = (progress) => 1 - Math.pow(1 - progress, 3)
 
@@ -147,9 +186,7 @@ const scrollToReachedStep = async () => {
     return
   }
 
-  const targetElement = document.querySelector(
-    `[data-step-position="${targetStep.position}"]`,
-  )
+  const targetElement = document.querySelector(`[data-step-position="${targetStep.position}"]`)
 
   if (!targetElement) {
     return
@@ -174,6 +211,27 @@ const triggerToast = (msg, type = 'error') => {
   toastTimeoutId = setTimeout(() => {
     showToast.value = false
   }, 3500)
+}
+
+const closeBadgeCelebration = () => {
+  showBadgeCelebration.value = false
+  celebrationBadge.value = null
+  celebrationBadgeCount.value = 0
+}
+
+const triggerBadgeCelebration = (xpValue) => {
+  const unlockedBadges = getUnlockedBadgesFromXp(xpValue)
+  const seenCount = Number(localStorage.getItem(BADGE_SEEN_KEY) || 0)
+  const newBadgeCount = Math.max(0, unlockedBadges.length - seenCount)
+
+  if (newBadgeCount <= 0) {
+    return
+  }
+
+  celebrationBadgeCount.value = newBadgeCount
+  celebrationBadge.value =
+    unlockedBadges[seenCount] ?? unlockedBadges[unlockedBadges.length - 1] ?? null
+  showBadgeCelebration.value = Boolean(celebrationBadge.value)
 }
 
 const handleStepClick = async (step) => {
@@ -243,7 +301,7 @@ const resolveXpForNotification = async (stepsData) => {
       )
 
       if (xpFromApi !== null) {
-        return xpFromApi
+        return mergeXpWithLocal(xpFromApi)
       }
     }
   } catch {
@@ -253,7 +311,7 @@ const resolveXpForNotification = async (stepsData) => {
   const completedCount = Array.isArray(stepsData)
     ? stepsData.filter((step) => step?.isCompleted).length
     : 0
-  return completedCount * 25
+  return mergeXpWithLocal(completedCount * 25)
 }
 
 const updateBadgesNotification = async (stepsData) => {
@@ -262,11 +320,13 @@ const updateBadgesNotification = async (stepsData) => {
   currentUnlockedBadges.value = unlockedCountByXp
   const seenCount = Number(localStorage.getItem(BADGE_SEEN_KEY) || 0)
   hasNewBadges.value = unlockedCountByXp > seenCount
+  return xpValue
 }
 
 const openBadges = () => {
   localStorage.setItem(BADGE_SEEN_KEY, String(currentUnlockedBadges.value))
   hasNewBadges.value = false
+  closeBadgeCelebration()
   router.push('/badges')
 }
 
@@ -277,10 +337,11 @@ onMounted(async () => {
   try {
     const stepsResponse = await api.get('/steps')
     steps.value = stepsResponse.data
-    await updateBadgesNotification(stepsResponse.data)
+    const xpValue = await updateBadgesNotification(stepsResponse.data)
     await scrollToReachedStep()
 
     if (route.query.validated === 'true') {
+      triggerBadgeCelebration(xpValue)
       const gainedXp = Number(route.query.gainedXp ?? 0)
       const successMessage =
         gainedXp > 0
@@ -376,6 +437,118 @@ onBeforeUnmount(() => {
     opacity: 1;
   }
 }
+
+.reward-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(v.$black, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.reward-popup {
+  width: min(420px, 100%);
+  padding: 24px 20px 22px;
+  border-radius: 26px;
+  border: 1px solid rgba(v.$text-white, 0.14);
+  background:
+    radial-gradient(circle at top, rgba(v.$eco-green, 0.14), transparent 38%),
+    linear-gradient(180deg, rgba(v.$card-bg, 0.99), rgba(v.$status-btn-bg, 0.96));
+  box-shadow:
+    0 24px 60px rgba(v.$black, 0.4),
+    inset 0 1px 0 rgba(v.$text-white, 0.05);
+  text-align: center;
+}
+
+.reward-kicker {
+  margin: 0 0 8px;
+  color: v.$eco-green;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.reward-popup h2 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+
+.reward-badge-frame {
+  width: 174px;
+  height: 174px;
+  margin: 18px auto 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 34px;
+  background: rgba(v.$black, 0.18);
+  border: 1px solid rgba(v.$eco-green, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(v.$text-white, 0.04);
+  overflow: hidden;
+}
+
+.reward-badge-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) brightness(0.72) contrast(1.08);
+  animation: badge-reveal 1.15s ease forwards;
+}
+
+.reward-subtext {
+  margin-top: 10px;
+  color: v.$text-muted;
+}
+
+.reward-btn {
+  border: none;
+  padding: 12px 18px;
+  margin-top: 10px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, v.$eco-green, v.$eco-green-dark);
+  color: v.$olive-text;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 6px 0 v.$eco-green-shadow;
+}
+
+.badge-pop-enter-active {
+  animation: badge-pop-in 0.38s ease;
+}
+
+.badge-pop-leave-active {
+  animation: badge-pop-in 0.28s ease reverse;
+}
+
+@keyframes badge-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes badge-reveal {
+  0% {
+    filter: grayscale(1) brightness(0.7) contrast(1.05);
+    transform: scale(0.9) rotate(-4deg);
+  }
+  55% {
+    filter: grayscale(0.25) brightness(1.05) contrast(1.04);
+    transform: scale(1.03) rotate(2deg);
+  }
+  100% {
+    filter: grayscale(0) brightness(1) contrast(1.04);
+    transform: scale(1) rotate(0);
+  }
+}
+
 .path-container {
   display: flex;
   flex-direction: column;
@@ -402,7 +575,7 @@ onBeforeUnmount(() => {
   color: v.$text-white;
   border: none;
   padding: 18px 60px;
-  border-radius: 35px;
+  border-radius: 15px;
   font-weight: 900;
   font-size: 1.1rem;
   cursor: pointer;
@@ -474,6 +647,15 @@ onBeforeUnmount(() => {
       color: v.$text-white;
     }
 
+    .treasure-icon {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      filter: drop-shadow(0 3px 4px rgba(v.$black, 0.28));
+      user-select: none;
+      pointer-events: none;
+    }
+
     .check-icon {
       position: absolute;
       top: -5px;
@@ -517,6 +699,12 @@ onBeforeUnmount(() => {
       .step-number {
         color: v.$olive-text;
       }
+    }
+  }
+
+  &.treasure {
+    .node-circle {
+      border: 2px solid rgba(255, 210, 104, 0.75);
     }
   }
 
@@ -567,10 +755,25 @@ onBeforeUnmount(() => {
     gap: 12px;
   }
 
+  .reward-popup {
+    padding: 20px 16px 18px;
+    border-radius: 22px;
+  }
+
+  .reward-popup h2 {
+    font-size: 1.45rem;
+  }
+
+  .reward-badge-frame {
+    width: 146px;
+    height: 146px;
+    border-radius: 28px;
+  }
+
   .badges-link {
     width: 100%;
     padding: 14px 16px;
-    border-radius: 16px;
+    border-radius: 15px;
     font-size: 1rem;
   }
 

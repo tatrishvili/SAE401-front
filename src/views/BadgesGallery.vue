@@ -12,13 +12,20 @@
 
     <section class="badges-grid" v-if="displayedBadges.length > 0">
       <article
-        v-for="badge in displayedBadges"
+        v-for="(badge, index) in displayedBadges"
         :key="badge.id"
         class="badge-card"
         :class="{ locked: !isUnlocked(badge.id), unlocked: isUnlocked(badge.id) }"
       >
         <span class="xp-threshold">{{ badge.xpRequired }} XP</span>
-        <div class="badge-icon" :title="badge.name">{{ badge.icon }}</div>
+        <div class="badge-visual" :title="badge.name">
+          <img
+            class="badge-photo"
+            :class="{ unlocked: isUnlocked(badge.id), locked: !isUnlocked(badge.id) }"
+            :src="resolveBadgeImage(badge, index)"
+            :alt="badge.name"
+          />
+        </div>
         <h2>{{ badge.name }}</h2>
         <p>{{ badge.description }}</p>
       </article>
@@ -32,59 +39,21 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import XpDisplay from '@/components/XpDisplay.vue'
+import { mergeXpWithLocal } from '@/services/xpLocal'
+import {
+  DEFAULT_BADGE_CATALOG,
+  getUnlockedBadgesFromXp,
+  normalizeBadgesArray,
+  resolveBadgeImage,
+} from '@/services/badges'
 
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
 const BADGE_SEEN_KEY = 'seenUnlockedBadgesCount'
 
-const DEFAULT_BADGES = [
-  {
-    id: 'sprout',
-    name: 'Sprout',
-    description: 'Premier pas vers une routine plus verte.',
-    icon: '🌱',
-    xpRequired: 25,
-  },
-  {
-    id: 'recycler',
-    name: 'Recycler',
-    description: 'Tri et recyclage valides plusieurs fois.',
-    icon: '♻️',
-    xpRequired: 60,
-  },
-  {
-    id: 'water-saver',
-    name: 'Eco Eau',
-    description: 'Habitudes d economie d eau maintenues.',
-    icon: '💧',
-    xpRequired: 100,
-  },
-  {
-    id: 'bike-rider',
-    name: 'Mobilite Douce',
-    description: 'Deplacements responsables et reguliers.',
-    icon: '🚲',
-    xpRequired: 180,
-  },
-  {
-    id: 'solar-mind',
-    name: 'Energie Claire',
-    description: 'Actions liees a la reduction energetique.',
-    icon: '☀️',
-    xpRequired: 260,
-  },
-  {
-    id: 'planet-guardian',
-    name: 'Gardien Planete',
-    description: 'Palier elite de progression eco.',
-    icon: '🏆',
-    xpRequired: 400,
-  },
-]
-
 const xp = ref(0)
 const earnedBadges = ref([])
-const badgesCatalog = ref(DEFAULT_BADGES)
+const badgesCatalog = ref(DEFAULT_BADGE_CATALOG)
 const nextBadgeThreshold = ref(100)
 const loading = ref(false)
 const errorMessage = ref('')
@@ -99,17 +68,6 @@ const toValidNumber = (...values) => {
 
   return null
 }
-
-const normalizeBadge = (badge) => ({
-  id: String(badge.id ?? badge.slug ?? badge.code ?? badge.name ?? '').toLowerCase(),
-  name: badge.name ?? badge.label ?? 'Badge',
-  description: badge.description ?? badge.details ?? 'Badge a debloquer',
-  icon: badge.icon ?? '🏅',
-  xpRequired: Number(badge.xpRequired ?? badge.requiredXp ?? badge.threshold ?? 0),
-})
-
-const normalizeBadgesArray = (value) =>
-  Array.isArray(value) ? value.map(normalizeBadge).filter((badge) => badge.id) : []
 
 const displayedBadges = computed(() => {
   const earnedMap = new Map(
@@ -128,13 +86,13 @@ const displayedBadges = computed(() => {
     }
   }
 
-  return merged
+  return merged.sort((a, b) => a.xpRequired - b.xpRequired)
 })
 
 const unlockedIds = computed(() => {
   const unlockedFromApi = normalizeBadgesArray(earnedBadges.value).map((badge) => badge.id)
-  const unlockedFromXp = normalizeBadgesArray(badgesCatalog.value)
-    .filter((badge) => badge.xpRequired > 0 && xp.value >= badge.xpRequired)
+  const unlockedFromXp = getUnlockedBadgesFromXp(xp.value)
+    .filter((badge) => badge.xpRequired > 0)
     .map((badge) => badge.id)
 
   return new Set([...unlockedFromApi, ...unlockedFromXp])
@@ -187,7 +145,7 @@ const fetchStepsXpFallback = async (token) => {
       ? stepsPayload
       : []
   const completedCount = steps.filter((step) => step?.isCompleted).length
-  xp.value = completedCount * 25
+  xp.value = mergeXpWithLocal(completedCount * 25)
   return true
 }
 
@@ -221,7 +179,7 @@ const fetchStats = async () => {
         payload?.totalXp,
       )
 
-      xp.value = xpFromApi ?? 0
+      xp.value = mergeXpWithLocal(xpFromApi ?? 0)
       earnedBadges.value = Array.isArray(data?.badges) ? data.badges : []
 
       const catalogFromApi =
@@ -232,7 +190,7 @@ const fetchStats = async () => {
         data?.badges_catalog
 
       if (Array.isArray(catalogFromApi) && catalogFromApi.length > 0) {
-        badgesCatalog.value = catalogFromApi
+        badgesCatalog.value = normalizeBadgesArray(catalogFromApi)
       }
 
       if (xpFromApi === null) {
@@ -337,16 +295,39 @@ onMounted(fetchStats)
     border: 1px solid rgba(v.$badge-gold, 0.45);
   }
 
-  .badge-icon {
-    width: 64px;
-    height: 64px;
+  .badge-visual {
+    position: relative;
+    width: 72px;
+    height: 72px;
     margin-bottom: 12px;
-    border-radius: 16px;
-    display: grid;
-    place-items: center;
-    font-size: 1.9rem;
-    background: rgba(v.$badge-gold, 0.18);
-    border: 1px solid rgba(v.$badge-gold, 0.45);
+    border-radius: 50%;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 30% 28%, rgba(v.$text-white, 0.24), transparent 26%),
+      rgba(v.$badge-gold, 0.08);
+    border: 2px solid rgba(v.$badge-gold, 0.62);
+    box-shadow:
+      0 0 0 6px rgba(v.$badge-gold, 0.12),
+      inset 0 0 0 1px rgba(v.$text-white, 0.04);
+  }
+
+  .badge-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scale(1.02);
+    filter: grayscale(1) brightness(0.78) contrast(1.05);
+    transition:
+      filter 0.45s ease,
+      transform 0.45s ease,
+      opacity 0.45s ease;
+  }
+
+  .badge-photo.unlocked {
+    filter: grayscale(0) brightness(1) contrast(1.05);
+    transform: scale(1);
+    animation: badge-colorize 0.75s ease both;
   }
 
   h2 {
@@ -368,7 +349,7 @@ onMounted(fetchStats)
       border-color: rgba(v.$success, 0.45);
     }
 
-    .badge-icon {
+    .badge-visual {
       box-shadow: 0 8px 18px rgba(v.$badge-gold, 0.35);
     }
 
@@ -379,8 +360,26 @@ onMounted(fetchStats)
   }
 
   &.locked {
-    filter: grayscale(1);
-    opacity: 0.45;
+    opacity: 0.92;
+
+    .badge-photo {
+      filter: grayscale(1) brightness(0.7) contrast(1);
+    }
+  }
+}
+
+@keyframes badge-colorize {
+  0% {
+    filter: grayscale(1) brightness(0.72) contrast(1.08);
+    transform: scale(0.96);
+  }
+  60% {
+    filter: grayscale(0.25) brightness(1.06) contrast(1.04);
+    transform: scale(1.03);
+  }
+  100% {
+    filter: grayscale(0) brightness(1) contrast(1.05);
+    transform: scale(1);
   }
 }
 
@@ -432,10 +431,9 @@ onMounted(fetchStats)
       font-size: 0.66rem;
     }
 
-    .badge-icon {
-      width: 54px;
-      height: 54px;
-      font-size: 1.6rem;
+    .badge-visual {
+      width: 58px;
+      height: 58px;
       margin-bottom: 8px;
     }
 

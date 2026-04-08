@@ -12,6 +12,20 @@
       </div>
     </Transition>
 
+    <Transition name="reward-pop">
+      <div v-if="showTreasurePopup" class="reward-overlay" @click.self="closeTreasurePopup">
+        <div class="reward-popup" role="dialog" aria-modal="true" aria-label="Recompense tresor">
+          <p class="reward-kicker">Jour trésor</p>
+          <h2>Félicitations !</h2>
+          <p>
+            Tu as atteint le jour {{ currentStepPosition }}.<br />
+            Voici une récompense: <strong>+{{ treasureBonusXp }} XP</strong>.
+          </p>
+          <button type="button" class="reward-btn" @click="closeTreasurePopup">Super !</button>
+        </div>
+      </div>
+    </Transition>
+
     <header class="header">
       <button @click="$router.push('/')" class="back-btn">←</button>
       <div class="title-group">
@@ -24,7 +38,12 @@
     <div class="challenges-list">
       <div v-if="loading" class="loading">Chargement de vos missions...</div>
 
-      <div v-else v-for="challenge in challenges" :key="challenge.id" class="challenge-card">
+      <div
+        v-else
+        v-for="(challenge, index) in challenges"
+        :key="challengeKey(challenge, index)"
+        class="challenge-card"
+      >
         <div class="card-body">
           <div class="card-meta">
             <span class="category">{{ challenge.category }}</span>
@@ -40,8 +59,8 @@
         <div class="card-actions" v-if="!isAlreadyCompleted">
           <button
             class="status-btn done"
-            :class="{ active: getStatus(challenge.id) === 'done' }"
-            @click="setStatus(challenge.id, 'done')"
+            :class="{ active: getStatus(challengeKey(challenge, index)) === 'done' }"
+            @click="setStatus(challengeKey(challenge, index), 'done', challenge)"
           >
             <div class="icon-circle">✓</div>
             <span>C'est fait !</span>
@@ -49,8 +68,8 @@
 
           <button
             class="status-btn skip"
-            :class="{ active: getStatus(challenge.id) === 'skip' }"
-            @click="setStatus(challenge.id, 'skip')"
+            :class="{ active: getStatus(challengeKey(challenge, index)) === 'skip' }"
+            @click="setStatus(challengeKey(challenge, index), 'skip', challenge)"
           >
             <div class="icon-circle">✕</div>
             <span>Je ne peux pas</span>
@@ -77,6 +96,11 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
+import {
+  claimTreasureXpForStep,
+  getTreasureXpForStep,
+  setChallengeXpForStep,
+} from '../services/xpLocal'
 
 const route = useRoute()
 const router = useRouter()
@@ -86,10 +110,27 @@ const isAlreadyCompleted = ref(false)
 const currentStepPosition = ref(null)
 const showToast = ref(false)
 const toastMessage = ref('')
+const showTreasurePopup = ref(false)
+const treasureBonusXp = ref(0)
+const currentStepId = ref(null)
+const treasureNeedsClaim = ref(false)
+const TREASURE_BONUS_XP = 50
 let toastTimeoutId = null
 
 // Stockage des choix (on ne met rien par défaut pour forcer un choix)
 const challengeStatuses = ref({})
+
+const isTreasurePosition = (position) => Number(position) === 1 || Number(position) % 5 === 0
+
+const closeTreasurePopup = () => {
+  if (treasureNeedsClaim.value && currentStepId.value) {
+    const claimedAmount = claimTreasureXpForStep(currentStepId.value, TREASURE_BONUS_XP)
+    treasureBonusXp.value = claimedAmount
+    treasureNeedsClaim.value = false
+  }
+
+  showTreasurePopup.value = false
+}
 
 onMounted(async () => {
   try {
@@ -99,6 +140,21 @@ onMounted(async () => {
     if (currentStep) {
       isAlreadyCompleted.value = currentStep.isCompleted
       currentStepPosition.value = currentStep.position
+      currentStepId.value = Number(currentStep.id)
+
+      const isTreasure = isTreasurePosition(currentStep.position)
+
+      if (isTreasure) {
+        const alreadyClaimed = getTreasureXpForStep(currentStepId.value)
+
+        if (alreadyClaimed > 0) {
+          treasureBonusXp.value = alreadyClaimed
+        } else {
+          treasureBonusXp.value = TREASURE_BONUS_XP
+          showTreasurePopup.value = true
+          treasureNeedsClaim.value = true
+        }
+      }
     }
 
     const response = await api.get(`/steps/${route.params.id}/challenges`)
@@ -112,7 +168,12 @@ onMounted(async () => {
   }
 })
 
-const getStatus = (id) => challengeStatuses.value[id]
+const challengeKey = (challenge, index) => {
+  const rawId = challenge?.id ?? challenge?.challengeId ?? challenge?.slug ?? 'mission'
+  return `${String(rawId)}-${index}`
+}
+
+const getStatus = (key) => challengeStatuses.value[key]
 const getChallengeXp = (challenge) => {
   const value = Number(
     challenge?.xp ?? challenge?.xpReward ?? challenge?.rewardXp ?? challenge?.points ?? 25,
@@ -132,15 +193,14 @@ const triggerSuccessToast = (message) => {
   }, 2800)
 }
 
-const setStatus = (id, status) => {
+const setStatus = (key, status, challenge) => {
   // Si on reclique sur le même, on peut décocher (optionnel)
-  if (challengeStatuses.value[id] === status) {
-    challengeStatuses.value[id] = null
+  if (challengeStatuses.value[key] === status) {
+    challengeStatuses.value[key] = null
   } else {
-    challengeStatuses.value[id] = status
+    challengeStatuses.value[key] = status
 
     if (status === 'done') {
-      const challenge = challenges.value.find((item) => item.id === id)
       const xp = getChallengeXp(challenge)
       triggerSuccessToast(`T'as fait : ${challenge?.title || 'Défi validé'} (+${xp} XP)`)
     }
@@ -149,12 +209,25 @@ const setStatus = (id, status) => {
 
 const validateDay = async () => {
   try {
-    const gainedXp = challenges.value
-      .filter((challenge) => getStatus(challenge.id) === 'done')
+    const baseXp = challenges.value
+      .filter((challenge, index) => getStatus(challengeKey(challenge, index)) === 'done')
       .reduce((total, challenge) => total + getChallengeXp(challenge), 0)
 
+    if (currentStepId.value) {
+      setChallengeXpForStep(currentStepId.value, baseXp)
+    }
+
+    const gainedXp = baseXp + treasureBonusXp.value
+
     await api.post(`/steps/${route.params.id}/unlock-next`)
-    router.push({ path: '/', query: { validated: 'true', gainedXp: String(gainedXp) } })
+    router.push({
+      path: '/',
+      query: {
+        validated: 'true',
+        gainedXp: String(gainedXp),
+        treasureBonusXp: String(treasureBonusXp.value),
+      },
+    })
   } catch {
     console.error('Erreur validation')
   }
@@ -218,6 +291,89 @@ const validateDay = async () => {
 .fade-toast-leave-to {
   opacity: 0;
   transform: translate(-50%, -10px);
+}
+
+.reward-pop-enter-active,
+.reward-pop-leave-active {
+  transition: opacity 0.24s ease;
+}
+
+.reward-pop-enter-from,
+.reward-pop-leave-to {
+  opacity: 0;
+}
+
+.reward-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(249, 103, 80, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 1100;
+}
+
+.reward-popup {
+  width: min(92vw, 420px);
+  border-radius: 20px;
+  border: 2px solid #f96750;
+  padding: 22px 20px;
+  background: linear-gradient(165deg, #f96750, #e85d47 58%, #cc533e);
+  box-shadow: 0 18px 40px rgba(204, 83, 62, 0.48);
+  text-align: center;
+  color: v.$text-white;
+  animation: reward-pop-in 0.32s ease;
+
+  h2 {
+    margin: 6px 0 10px;
+    font-size: 1.6rem;
+    color: v.$text-white;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.45;
+    color: rgba(v.$text-white, 0.95);
+  }
+}
+
+.reward-kicker {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffd0c6;
+}
+
+.reward-btn {
+  margin-top: 18px;
+  border: none;
+  border-radius: 15px;
+  padding: 12px 18px;
+  font-size: 1rem;
+  font-weight: 900;
+  color: v.$text-white;
+  background: linear-gradient(180deg, #ff8a73, #f96750);
+  box-shadow: 0 5px 0 #cc533e;
+  cursor: pointer;
+
+  &:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #cc533e;
+  }
+}
+
+@keyframes reward-pop-in {
+  0% {
+    transform: scale(0.84);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .challenge-page {
@@ -341,7 +497,7 @@ const validateDay = async () => {
   background: v.$status-btn-bg;
   border: 2px solid transparent;
   padding: 15px 10px;
-  border-radius: 20px;
+  border-radius: 15px;
   color: v.$text-muted;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -396,7 +552,7 @@ const validateDay = async () => {
   color: v.$text-white;
   border: none;
   padding: 18px 60px;
-  border-radius: 35px;
+  border-radius: 15px;
   font-weight: 900;
   font-size: 1.1rem;
   cursor: pointer;
@@ -413,7 +569,7 @@ const validateDay = async () => {
   color: v.$text-muted;
   border: 1px solid v.$card-border;
   padding: 14px 40px;
-  border-radius: 25px;
+  border-radius: 15px;
   cursor: pointer;
 }
 
@@ -467,13 +623,13 @@ const validateDay = async () => {
     flex-direction: row;
     justify-content: flex-start;
     padding: 11px 12px;
-    border-radius: 14px;
+    border-radius: 15px;
   }
 
   .btn-primary {
     width: 100%;
     padding: 14px 16px;
-    border-radius: 16px;
+    border-radius: 15px;
     font-size: 1rem;
     box-shadow: 0 4px 0 v.$eco-green-shadow;
   }
