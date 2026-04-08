@@ -6,6 +6,7 @@ import ConseilsView from '@/views/ConseilsView.vue'
 import InscriptionView from '@/views/InscriptionView.vue'
 import CalculateurView from '@/views/CalculateurView.vue'
 import ProfilView from '@/views/ProfilView.vue'
+import DashboardView from '@/views/DashboardView.vue'
 
 
 const router = createRouter({
@@ -18,6 +19,7 @@ const router = createRouter({
     { path: '/inscription', component: InscriptionView },
     { path: '/calculateur', component: CalculateurView, name:'Action' },
     { path: '/profil', component: ProfilView, name:'Profil' },
+    { path: '/dashboard', component: DashboardView, name: 'Dashboard' },
   ]
 })
 
