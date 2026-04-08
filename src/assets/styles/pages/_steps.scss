@@ -1,0 +1,72 @@
+@use '../abstracts/variables';
+@use '../abstracts/mixins';
+
+%step-base {
+   @include mixins.step-container;
+
+  .choices {
+     @include mixins.flex-center(column);
+  }
+
+  .suivant {
+     @include mixins.main-btn;
+  }
+}
+
+// STEP 1
+.step1 {
+  @extend %step-base;
+
+  .choices button {
+    @include mixins.choice-btn(15vh);
+  }
+}
+
+// STEP 2
+.step2 {
+  @extend %step-base;
+
+  .choices button {
+    @include mixins.choice-btn(7vh);
+  }
+
+  .disparait {
+    display: none;
+  }
+
+  .inpuuut {
+    @include mixins.flex-center(column);
+    margin-bottom: 3vh;
+
+    label {
+      margin-bottom: 2vh;
+    }
+
+    input {
+      background-color: variables.$d3;
+      border-radius: 1vh;
+      font-size: variables.$button;
+      padding: 1.5vh;
+      color: variables.$l1;
+      border: 2px solid variables.$d1;
+
+      &:focus {
+        outline: none;
+        border: 3px solid variables.$l1;
+      }
+    }
+  }
+}
+
+// STEP 3
+.step3 {
+  @extend %step-base;
+
+  .choices button {
+    @include mixins.choice-btn(15vh);
+  }
+
+  .suivant {
+    display: none;
+  }
+}

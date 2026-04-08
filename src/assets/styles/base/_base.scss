@@ -1,0 +1,15 @@
+// _base.scss
+@use '../abstracts/variables' as *;
+
+body {
+  background-color: $d4;
+  font-family: $text;
+  margin: 0;
+  padding: 0;
+  color: $l1;
+}
+
+* {
+  font-weight: 700;
+}
+

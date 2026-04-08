@@ -1,0 +1,16 @@
+
+@use '../abstracts/variables';
+
+button {
+  color: variables.$l1;
+}
+
+
+.btn {
+  all: unset;
+  display: block;
+  color: variables.$l1;
+  background-color: variables.$c1;
+  border-radius: 1vh;
+  padding: 1.5vh;
+}

@@ -1,0 +1,223 @@
+// pages/_connexion.scss
+@use '../abstracts/variables' as *;
+
+.connexion-screen {
+  font-family: $text;
+  background-color: $d4;
+  min-height: 100vh;
+  padding: 48px $page;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  // ---------------- CONTENT ----------------
+  .content {
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  // ---------------- TITLE ----------------
+  .title {
+    font-family: $fantasy;
+    font-size: $title;
+    color: $l1;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  // ---------------- FORM ----------------
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .input {
+        width: 100%;
+        background-color: $d3;
+        border: 1.5px solid transparent;
+        border-radius: 14px;
+        padding: 16px 20px;
+        font-family: $text;
+        font-size: $subbody;
+        color: $l1;
+        outline: none;
+        box-sizing: border-box;
+        transition: background-color 0.2s, border-color 0.2s;
+
+        &::placeholder {
+          color: $d1;
+        }
+
+        &:focus {
+          background-color: $d3;
+          border-color: $d1;
+        }
+
+        &.input-error {
+          border-color: $c1 !important;
+        }
+      }
+
+      .toggle-password {
+        position: absolute;
+        right: 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: $d1;
+        display: flex;
+        align-items: center;
+        padding: 0;
+        transition: color 0.2s;
+
+        &:hover {
+          color: $l5;
+        }
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
+    .error-msg {
+      color: $c1;
+      font-size: $subbody;
+      margin: -8px 0 0 4px;
+    }
+
+    // ---------------- FORGOT ----------------
+    .forgot-row {
+      display: flex;
+      justify-content: flex-end;
+
+      .forgot-link {
+        font-size: $subbody;
+        color: $l5;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        cursor: pointer;
+
+        &:hover {
+          color: $l1;
+        }
+      }
+    }
+
+    // ---------------- BUTTON ----------------
+    .connexion-btn {
+      background-color: $c1;
+      color: $l1;
+      font-family: $text;
+      font-size: $button;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      padding: 16px 0;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba($c1, 0.35);
+
+      &:hover {
+        filter: brightness(0.9);
+        box-shadow: 0 6px 24px rgba($c1, 0.5);
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+  }
+
+  // ---------------- SEPARATOR ----------------
+  .separator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0;
+
+    &-line {
+      flex: 1;
+      height: 1px;
+      background-color: $d3;
+    }
+
+    &-text {
+      font-size: $subbody;
+      color: $d1;
+      white-space: nowrap;
+    }
+  }
+
+  // ---------------- SOCIAL ----------------
+  .social-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background-color: transparent;
+      border: 1.5px solid $c1;
+      border-radius: 50px;
+      padding: 14px 0;
+      width: 100%;
+      font-family: $text;
+      font-size: $subbody;
+      font-weight: 600;
+      color: $l1;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.15s;
+
+      &:hover {
+        background-color: rgba($c1, 0.08);
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+
+      .social-icon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .apple-icon {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+// ---------------- ANIMATION ----------------
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,234 @@
+// pages/_inscription.scss
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+.inscription-screen {
+  font-family: 'Nunito', sans-serif;
+  background-color: #1e2530;
+  min-height: 100vh;
+  padding: 40px 28px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  // ---------------- CONTENT ----------------
+  .content {
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  // ---------------- HEADER ----------------
+  .header {
+    display: flex;
+    align-items: center;
+
+    .back-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #c8d0da;
+      padding: 0;
+
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #ffffff;
+      }
+
+      svg {
+        width: 22px;
+        height: 22px;
+      }
+    }
+  }
+
+  // ---------------- TITLE ----------------
+  .title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .subtitle {
+    font-size: 0.88rem;
+    color: #7a8899;
+    margin-top: -8px;
+    line-height: 1.5;
+  }
+
+  // ---------------- FORM ----------------
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .input {
+        width: 100%;
+        background-color: #2a3242;
+        border: 1.5px solid transparent;
+        border-radius: 14px;
+        padding: 16px 20px;
+        font-family: 'Nunito', sans-serif;
+        font-size: 0.95rem;
+        color: #ffffff;
+        outline: none;
+        box-sizing: border-box;
+        transition: background-color 0.2s, border-color 0.2s;
+
+        &::placeholder {
+          color: #7a8899;
+        }
+
+        &:focus {
+          background-color: #313d52;
+          border-color: #3a4f6a;
+        }
+
+        &.input-error {
+          border-color: #f07050 !important;
+        }
+      }
+
+      .toggle-password {
+        position: absolute;
+        right: 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #7a8899;
+        display: flex;
+        align-items: center;
+        padding: 0;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #aab4c0;
+        }
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
+    .error-msg {
+      color: #f07050;
+      font-size: 0.78rem;
+      margin-left: 4px;
+    }
+
+    // ---------------- PASSWORD STRENGTH ----------------
+    .strength-bar {
+      display: flex;
+      gap: 5px;
+      margin-top: 2px;
+
+      .strength-segment {
+        flex: 1;
+        height: 4px;
+        border-radius: 4px;
+        background-color: #3a4555;
+        transition: background-color 0.3s;
+
+        &.very-weak   { background-color: #e05030; }
+        &.weak        { background-color: #f08030; }
+        &.medium      { background-color: #f0c030; }
+        &.strong      { background-color: #60c070; }
+        &.very-strong { background-color: #30b060; }
+        &.empty       { background-color: #3a4555; }
+      }
+    }
+
+    .strength-label {
+      font-size: 0.75rem;
+      margin-left: 2px;
+
+      &.very-weak   { color: #e05030; }
+      &.weak        { color: #f08030; }
+      &.medium      { color: #f0c030; }
+      &.strong      { color: #60c070; }
+      &.very-strong { color: #30b060; }
+    }
+
+    // ---------------- BUTTON ----------------
+    .inscription-btn {
+      background-color: #f07050;
+      color: #ffffff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      padding: 16px 0;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 4px;
+
+      transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(240, 112, 80, 0.35);
+
+      &:hover {
+        background-color: #e05f40;
+        box-shadow: 0 6px 24px rgba(240, 112, 80, 0.5);
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+  }
+
+  // ---------------- LOGIN LINK ----------------
+  .login-link {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #7a8899;
+
+    .link {
+      color: #f07050;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+
+      &:hover {
+        color: #e05f40;
+      }
+    }
+  }
+}
+
+// ---------------- ANIMATION ----------------
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

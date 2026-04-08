@@ -1,0 +1,115 @@
+// pages/_profil.scss
+@use '../abstracts/variables';
+@use '../abstracts/mixins';
+
+.profile-page {
+  // @include flex-center(column);
+  min-height: 100vh;
+  padding: 0;
+  background-color: variables.$d4;
+  color: variables.$l1;
+
+  // ---------------- HEADER ----------------
+  .header {
+    width: 100%;
+    margin-bottom: 30px;
+    background-color: variables.$d3;
+
+    // @include flex-center;
+    justify-content: space-between;
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 500;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: variables.$l1;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+  }
+
+  // ---------------- AVATAR ----------------
+  .avatar-section {
+    text-align: center;
+    margin-bottom: 30px;
+
+    .avatar-circle {
+      width: 140px;
+      height: 140px;
+      background-color: variables.$l1;
+      border-radius: 50%;
+      margin: 0 auto 15px;
+
+      // @include flex-center;
+      overflow: hidden;
+
+      img {
+        width: 70%;
+      }
+    }
+
+    .username {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  }
+
+  // ---------------- CONTAINERS ----------------
+  .stats-container,
+  .challenges-container {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  // ---------------- CARD ----------------
+  .card {
+    background-color: variables.$d3;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    &.challenge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  }
+
+  // ---------------- SEPARATOR ----------------
+  .separator {
+    width: 60%;
+    border: 0;
+    border-top: 1px solid rgba(variables.$l1, 0.3);
+    margin: 20px 0;
+  }
+
+  // ---------------- LOGOUT BUTTON ----------------
+  .logout-btn {
+    margin-top: auto;
+    margin-bottom: 20px;
+
+    background-color: variables.$c1;
+    color: variables.$l1;
+    border: none;
+    padding: 15px;
+    width: 80%;
+    max-width: 250px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+
+    &:active {
+      opacity: 0.8;
+    }
+  }
+}

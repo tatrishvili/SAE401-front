@@ -3,6 +3,10 @@ import WelcomeView from '@/views/WelcomeView.vue'
 import AccueilView from '@/views/AccueilView.vue'
 import ConnexionView from '@/views/ConnexionView.vue'
 import ConseilsView from '@/views/ConseilsView.vue'
+import InscriptionView from '@/views/InscriptionView.vue'
+import CalculateurView from '@/views/CalculateurView.vue'
+import ProfilView from '@/views/ProfilView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(),
@@ -11,8 +15,9 @@ const router = createRouter({
     { path: '/connexion', component: ConnexionView },
     { path: '/home', component: AccueilView, name: 'Accueil'},
     { path: '/conseils', component: ConseilsView },
-    { path: '/calculateur', component: () => import('@/views/CalculateurView.vue'), name:'Action' },
-    { path: '/profil', component: () => import('@/views/ProfilView.vue'), name:'Profil' },
+    { path: '/inscription', component: InscriptionView },
+    { path: '/calculateur', component: CalculateurView, name:'Action' },
+    { path: '/profil', component: ProfilView, name:'Profil' },
   ]
 })
 

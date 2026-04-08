@@ -37,7 +37,6 @@ const conseils = [
 // Change à chaque chargement de page
 const conseilDuJour = ref(conseils[Math.floor(Math.random() * conseils.length)])
 </script>
+<style>
 
-<style lang="css">
-@use "@/assets/styles/style.css" as *;
 </style>
