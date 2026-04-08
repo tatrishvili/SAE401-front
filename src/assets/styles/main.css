@@ -1,0 +1,265 @@
+.step1 button.selected {
+  background: #8792A4;
+  color: #373E4E;
+  border-color: #8792A4;
+}
+
+.step2 button.selected {
+  background: #8792A4;
+  color: #373E4E;
+  border-color: #8792A4;
+}
+
+.step2-food {
+  padding: 1rem;
+}
+.step2-food h2 {
+  margin-bottom: 0.25rem;
+}
+.step2-food .subtitle {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+.step2-food .main-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.step2-food .main-tabs button {
+  flex: 1;
+  padding: 0.6rem 0.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background: white;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.step2-food .main-tabs button.active {
+  background: #22c55e;
+  color: white;
+  border-color: #22c55e;
+}
+.step2-food .search-bar {
+  margin-bottom: 0.75rem;
+}
+.step2-food .search-bar input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+.step2-food .search-bar input:focus {
+  outline: none;
+  border-color: #22c55e;
+}
+.step2-food .food-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 38vh;
+  overflow-y: auto;
+  margin-bottom: 0.75rem;
+}
+.step2-food .food-list .empty {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+  font-size: 0.9rem;
+}
+.step2-food .food-list .food-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: white;
+  cursor: pointer;
+  text-align: left;
+  gap: 0.5rem;
+}
+.step2-food .food-list .food-item.selected {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+.step2-food .food-list .food-item .food-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+  flex: 1;
+}
+.step2-food .food-list .food-item .food-co2 {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+.step2-food .food-list .food-item .check {
+  color: #22c55e;
+  font-weight: bold;
+}
+.step2-food .selected-summary {
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.step2-food .selected-summary h3 {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+.step2-food .selected-summary .selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.step2-food .selected-summary .selected-tags .tag {
+  background: #22c55e;
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  user-select: none;
+}
+.step2-food .error-msg {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+.step2-food .error {
+  color: #ef4444;
+  font-size: 0.85rem;
+}
+.step2-food .loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+.step2-food .actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.step2-food .actions button {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.step2-food .actions .btn-back {
+  background: #f3f4f6;
+  color: #374151;
+}
+.step2-food .actions .btn-next {
+  background: #22c55e;
+  color: white;
+}
+.step2-food .step2-food button.selected {
+  background: #8792A4;
+  color: #373E4E;
+  border-color: #8792A4;
+}
+.step2-food .step2-food .main-tabs button {
+  background: transparent;
+  border: 2px solid #8792A4;
+  border-radius: 1rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.5rem;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  box-shadow: none;
+}
+.step2-food .step2-food .main-tabs button.selected {
+  background: #8792A4;
+  color: #373E4E;
+  border-color: #8792A4;
+}
+
+.step3-result .save-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+}
+.step3-result .btn-save {
+  width: 100%;
+  padding: 0.75rem;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.step3-result .btn-save:hover:not(:disabled) {
+  background: #16a34a;
+}
+.step3-result .btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.step3-result .success {
+  color: #16a34a;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+.step3-result .login-prompt {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #fef3c7;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+.step3-result .login-prompt a {
+  color: #f59e0b;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.step3-food-result {
+  padding: 1rem;
+}
+.step3-food-result .total-card {
+  background: #f0fdf4;
+  border: 2px solid #22c55e;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.step3-food-result .total-card .total-label {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+.step3-food-result .total-card .total-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #16a34a;
+}
+.step3-food-result .breakdown {
+  margin-bottom: 1.5rem;
+}
+.step3-food-result .breakdown h3 {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 0.75rem;
+}
+.step3-food-result .breakdown .breakdown-item {
+  display: flex;
+}
+
+/*# sourceMappingURL=main.css.map */

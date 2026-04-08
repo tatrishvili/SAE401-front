@@ -42,9 +42,5 @@ const handleNext = () => {
 </script>
 
 <style scoped>
-button.selected {
-  background: #8792A4;
-  color: #373E4E;
-  border-color: #8792A4;
-}
+
 </style>

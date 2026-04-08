@@ -1,21 +1,21 @@
 <template>
-  <div class="step2-food">
+  <div class="step2-food step2">
     <h2>Qu'avez-vous mangé ?</h2>
     <p class="subtitle">Sélectionnez tous les aliments consommés</p>
 
     <div class="main-tabs">
-      <button
-          :class="{ active: activeTab === 'viandes' }"
+        <button
+          :class="{ selected: activeTab === 'viandes' }"
           @click="activeTab = 'viandes'"
-      > Viandes</button>
-      <button
-          :class="{ active: activeTab === 'fruitsetlegumes' }"
+        > Viandes</button>
+        <button
+          :class="{ selected: activeTab === 'fruitsetlegumes' }"
           @click="activeTab = 'fruitsetlegumes'"
-      > Fruits & Légumes</button>
-      <button
-          :class="{ active: activeTab === 'autres' }"
+        > Fruits & Légumes</button>
+        <button
+          :class="{ selected: activeTab === 'autres' }"
           @click="activeTab = 'autres'"
-      > Autres</button>
+        > Autres</button>
     </div>
 
     <!-- Search bar -->
@@ -212,167 +212,3 @@ const handleNext = () => {
 }
 </script>
 
-<style scoped lang="scss">
-.step2-food {
-  padding: 1rem;
-
-  h2 { margin-bottom: 0.25rem; }
-
-  .subtitle {
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-  }
-
-  .main-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-
-    button {
-      flex: 1;
-      padding: 0.6rem 0.25rem;
-      border-radius: 0.5rem;
-      border: 1px solid #e5e7eb;
-      background: white;
-      font-size: 0.82rem;
-      cursor: pointer;
-      font-weight: 500;
-      white-space: nowrap;
-
-      &.active {
-        background: #22c55e;
-        color: white;
-        border-color: #22c55e;
-      }
-    }
-  }
-
-  .search-bar {
-    margin-bottom: 0.75rem;
-
-    input {
-      width: 100%;
-      padding: 0.6rem 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.5rem;
-      font-size: 0.9rem;
-      box-sizing: border-box;
-
-      &:focus {
-        outline: none;
-        border-color: #22c55e;
-      }
-    }
-  }
-
-  .food-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    max-height: 38vh;
-    overflow-y: auto;
-    margin-bottom: 0.75rem;
-
-    .empty {
-      text-align: center;
-      padding: 2rem;
-      color: #999;
-      font-size: 0.9rem;
-    }
-
-    .food-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.65rem 0.75rem;
-      border: 1px solid #e5e7eb;
-      border-radius: 0.5rem;
-      background: white;
-      cursor: pointer;
-      text-align: left;
-      gap: 0.5rem;
-
-      &.selected {
-        border-color: #22c55e;
-        background: #f0fdf4;
-      }
-
-      .food-name {
-        font-weight: 500;
-        font-size: 0.9rem;
-        flex: 1;
-      }
-
-      .food-co2 {
-        font-size: 0.72rem;
-        color: #9ca3af;
-        white-space: nowrap;
-      }
-
-      .check {
-        color: #22c55e;
-        font-weight: bold;
-      }
-    }
-  }
-
-  .selected-summary {
-    background: #f9fafb;
-    border-radius: 0.5rem;
-    padding: 0.75rem;
-    margin-bottom: 0.75rem;
-
-    h3 {
-      font-size: 0.85rem;
-      color: #555;
-      margin-bottom: 0.5rem;
-    }
-
-    .selected-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-
-      .tag {
-        background: #22c55e;
-        color: white;
-        padding: 0.2rem 0.6rem;
-        border-radius: 999px;
-        font-size: 0.78rem;
-        cursor: pointer;
-        user-select: none;
-      }
-    }
-  }
-
-  .error-msg {
-    color: #ef4444;
-    font-size: 0.85rem;
-    margin-bottom: 0.5rem;
-    display: block;
-  }
-
-  .error { color: #ef4444; font-size: 0.85rem; }
-  .loading { text-align: center; padding: 2rem; color: #666; }
-
-  .actions {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-
-    button {
-      flex: 1;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 500;
-    }
-
-    .btn-back { background: #f3f4f6; color: #374151; }
-    .btn-next { background: #22c55e; color: white; }
-  }
-}
-</style>
