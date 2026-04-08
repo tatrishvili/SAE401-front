@@ -483,7 +483,7 @@ onBeforeUnmount(() => {
   margin: 18px auto 14px;
   display: grid;
   place-items: center;
-  border-radius: 34px;
+  border-radius: 50%;
   background: rgba(v.$black, 0.18);
   border: 1px solid rgba(v.$eco-green, 0.2);
   box-shadow: inset 0 0 0 1px rgba(v.$text-white, 0.04);
@@ -767,7 +767,7 @@ onBeforeUnmount(() => {
   .reward-badge-frame {
     width: 146px;
     height: 146px;
-    border-radius: 28px;
+    border-radius: 50%;
   }
 
   .badges-link {

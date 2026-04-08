@@ -14,14 +14,33 @@
 
     <Transition name="reward-pop">
       <div v-if="showTreasurePopup" class="reward-overlay" @click.self="closeTreasurePopup">
-        <div class="reward-popup" role="dialog" aria-modal="true" aria-label="Recompense tresor">
-          <p class="reward-kicker">Jour trésor</p>
-          <h2>Félicitations !</h2>
-          <p>
-            Tu as atteint le jour {{ currentStepPosition }}.<br />
-            Voici une récompense: <strong>+{{ treasureBonusXp }} XP</strong>.
-          </p>
-          <button type="button" class="reward-btn" @click="closeTreasurePopup">Super !</button>
+        <div
+          ref="rewardPopupRef"
+          class="reward-popup"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Recompense tresor"
+        >
+          <div class="reward-content" :class="{ revealed: scratchRevealed }">
+            <p class="reward-kicker">Jour trésor</p>
+            <h2>Félicitations !</h2>
+            <p>
+              Tu as atteint le jour {{ currentStepPosition }}.<br />
+              Voici une récompense: <strong>+{{ treasureBonusXp }} XP</strong>.
+            </p>
+            <button type="button" class="reward-btn" @click="closeTreasurePopup">Super !</button>
+          </div>
+
+          <canvas
+            v-if="!scratchRevealed"
+            ref="scratchCanvasRef"
+            class="scratch-layer"
+            @pointerdown="handleScratchStart"
+            @pointermove="handleScratchMove"
+            @pointerup="handleScratchEnd"
+            @pointerleave="handleScratchEnd"
+            @pointercancel="handleScratchEnd"
+          ></canvas>
         </div>
       </div>
     </Transition>
@@ -93,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { nextTick, ref, onBeforeUnmount, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
 import {
@@ -114,6 +133,10 @@ const showTreasurePopup = ref(false)
 const treasureBonusXp = ref(0)
 const currentStepId = ref(null)
 const treasureNeedsClaim = ref(false)
+const scratchRevealed = ref(false)
+const isScratching = ref(false)
+const rewardPopupRef = ref(null)
+const scratchCanvasRef = ref(null)
 const TREASURE_BONUS_XP = 50
 let toastTimeoutId = null
 
@@ -121,6 +144,176 @@ let toastTimeoutId = null
 const challengeStatuses = ref({})
 
 const isTreasurePosition = (position) => Number(position) === 1 || Number(position) % 5 === 0
+
+const drawScratchLayer = (cssWidth, cssHeight) => {
+  const canvas = scratchCanvasRef.value
+  if (!canvas) {
+    return
+  }
+
+  const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    return
+  }
+
+  const gradient = ctx.createLinearGradient(0, 0, cssWidth, cssHeight)
+  gradient.addColorStop(0, '#f97d4d')
+  gradient.addColorStop(1, '#db5728')
+
+  ctx.globalCompositeOperation = 'source-over'
+  ctx.clearRect(0, 0, cssWidth, cssHeight)
+  ctx.fillStyle = gradient
+  ctx.fillRect(0, 0, cssWidth, cssHeight)
+
+  for (let i = 0; i < 110; i += 1) {
+    const x = Math.random() * cssWidth
+    const y = Math.random() * cssHeight
+    ctx.fillStyle = 'rgba(255,255,255,0.08)'
+    ctx.beginPath()
+    ctx.arc(x, y, 2 + Math.random() * 2, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
+  ctx.font = `${Math.max(30, Math.floor(cssWidth * 0.09))}px sans-serif`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('GRATTER', cssWidth / 2, cssHeight / 2)
+}
+
+const initScratchCard = async () => {
+  await nextTick()
+
+  const popup = rewardPopupRef.value
+  const canvas = scratchCanvasRef.value
+
+  if (!popup || !canvas) {
+    return
+  }
+
+  const ratio = window.devicePixelRatio || 1
+  const cssWidth = Math.floor(popup.clientWidth || popup.getBoundingClientRect().width)
+  const cssHeight = Math.floor(popup.clientHeight || popup.getBoundingClientRect().height)
+
+  if (cssWidth <= 0 || cssHeight <= 0) {
+    return
+  }
+
+  canvas.width = Math.floor(cssWidth * ratio)
+  canvas.height = Math.floor(cssHeight * ratio)
+  canvas.style.width = `${cssWidth}px`
+  canvas.style.height = `${cssHeight}px`
+
+  const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    return
+  }
+
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
+  drawScratchLayer(cssWidth, cssHeight)
+}
+
+const openTreasurePopupWithScratch = async () => {
+  showTreasurePopup.value = true
+  scratchRevealed.value = false
+
+  await nextTick()
+  await new Promise((resolve) => requestAnimationFrame(() => resolve()))
+  await new Promise((resolve) => requestAnimationFrame(() => resolve()))
+  await initScratchCard()
+}
+
+const handleWindowResize = () => {
+  if (showTreasurePopup.value && !scratchRevealed.value) {
+    initScratchCard()
+  }
+}
+
+const getPointerPosition = (event) => {
+  const canvas = scratchCanvasRef.value
+  if (!canvas) {
+    return null
+  }
+
+  const rect = canvas.getBoundingClientRect()
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  }
+}
+
+const scratchAt = (event) => {
+  const canvas = scratchCanvasRef.value
+  if (!canvas || scratchRevealed.value) {
+    return
+  }
+
+  const ctx = canvas.getContext('2d')
+  const point = getPointerPosition(event)
+
+  if (!ctx || !point) {
+    return
+  }
+
+  ctx.globalCompositeOperation = 'destination-out'
+  ctx.beginPath()
+  ctx.arc(point.x, point.y, 24, 0, Math.PI * 2)
+  ctx.fill()
+}
+
+const revealIfEnoughScratched = () => {
+  const canvas = scratchCanvasRef.value
+  if (!canvas || scratchRevealed.value) {
+    return
+  }
+
+  const ctx = canvas.getContext('2d')
+  if (!ctx) {
+    return
+  }
+
+  const { width, height } = canvas
+  const pixels = ctx.getImageData(0, 0, width, height).data
+
+  let transparentPixels = 0
+  let sampledPixels = 0
+
+  for (let i = 3; i < pixels.length; i += 16) {
+    sampledPixels += 1
+    if (pixels[i] < 20) {
+      transparentPixels += 1
+    }
+  }
+
+  if (sampledPixels > 0 && transparentPixels / sampledPixels >= 0.18) {
+    scratchRevealed.value = true
+  }
+}
+
+const handleScratchStart = async (event) => {
+  if (scratchRevealed.value) {
+    return
+  }
+
+  event.preventDefault()
+  isScratching.value = true
+  scratchAt(event)
+  revealIfEnoughScratched()
+}
+
+const handleScratchMove = (event) => {
+  if (!isScratching.value || scratchRevealed.value) {
+    return
+  }
+
+  event.preventDefault()
+  scratchAt(event)
+  revealIfEnoughScratched()
+}
+
+const handleScratchEnd = () => {
+  isScratching.value = false
+}
 
 const closeTreasurePopup = () => {
   if (treasureNeedsClaim.value && currentStepId.value) {
@@ -130,9 +323,13 @@ const closeTreasurePopup = () => {
   }
 
   showTreasurePopup.value = false
+  scratchRevealed.value = false
+  isScratching.value = false
 }
 
 onMounted(async () => {
+  window.addEventListener('resize', handleWindowResize, { passive: true })
+
   try {
     const stepResponse = await api.get('/steps')
     const currentStep = stepResponse.data.find((s) => s.id == route.params.id)
@@ -151,8 +348,8 @@ onMounted(async () => {
           treasureBonusXp.value = alreadyClaimed
         } else {
           treasureBonusXp.value = TREASURE_BONUS_XP
-          showTreasurePopup.value = true
           treasureNeedsClaim.value = true
+          await openTreasurePopupWithScratch()
         }
       }
     }
@@ -166,6 +363,10 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleWindowResize)
 })
 
 const challengeKey = (challenge, index) => {
@@ -306,7 +507,8 @@ const validateDay = async () => {
 .reward-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(249, 103, 80, 0.22);
+  background: rgba(v.$black, 0.7);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -315,15 +517,40 @@ const validateDay = async () => {
 }
 
 .reward-popup {
+  position: relative;
   width: min(92vw, 420px);
-  border-radius: 20px;
-  border: 2px solid #f96750;
+  min-height: 250px;
+  border-radius: 22px;
+  border: 1px solid rgba(v.$badge-gold, 0.38);
   padding: 22px 20px;
-  background: linear-gradient(165deg, #f96750, #e85d47 58%, #cc533e);
-  box-shadow: 0 18px 40px rgba(204, 83, 62, 0.48);
+  background:
+    radial-gradient(circle at 14% 12%, rgba(v.$badge-gold, 0.18), transparent 38%),
+    linear-gradient(170deg, rgba(v.$card-bg, 0.98), rgba(v.$status-btn-bg, 0.96));
+  box-shadow:
+    0 20px 46px rgba(v.$black, 0.42),
+    inset 0 1px 0 rgba(v.$text-white, 0.05);
   text-align: center;
   color: v.$text-white;
   animation: reward-pop-in 0.32s ease;
+  overflow: hidden;
+
+  .reward-content {
+    transition:
+      visibility 0.2s linear,
+      opacity 0.24s ease;
+  }
+
+  .reward-content:not(.revealed) {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .reward-content.revealed {
+    opacity: 1;
+    visibility: visible;
+  }
 
   h2 {
     margin: 6px 0 10px;
@@ -334,8 +561,19 @@ const validateDay = async () => {
   p {
     margin: 0;
     line-height: 1.45;
-    color: rgba(v.$text-white, 0.95);
+    color: rgba(v.$text-white, 0.9);
   }
+}
+
+.scratch-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  cursor: grab;
+  touch-action: none;
+  z-index: 3;
 }
 
 .reward-kicker {
@@ -344,7 +582,7 @@ const validateDay = async () => {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #ffd0c6;
+  color: rgba(v.$badge-gold, 0.92);
 }
 
 .reward-btn {
@@ -354,14 +592,14 @@ const validateDay = async () => {
   padding: 12px 18px;
   font-size: 1rem;
   font-weight: 900;
-  color: v.$text-white;
-  background: linear-gradient(180deg, #ff8a73, #f96750);
-  box-shadow: 0 5px 0 #cc533e;
+  color: v.$olive-text;
+  background: linear-gradient(180deg, rgba(v.$eco-green, 0.96), rgba(v.$eco-green-dark, 0.96));
+  box-shadow: 0 5px 0 v.$eco-green-shadow;
   cursor: pointer;
 
   &:active {
     transform: translateY(3px);
-    box-shadow: 0 2px 0 #cc533e;
+    box-shadow: 0 2px 0 v.$eco-green-shadow;
   }
 }
 
