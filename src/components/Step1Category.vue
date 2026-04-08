@@ -17,7 +17,6 @@
     <button @click="handleNext" class="suivant">Suivant →</button>
   </div>
 </template>
-
 <script setup>
 import { reactive, ref } from 'vue'
 
