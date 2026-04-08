@@ -26,7 +26,12 @@
     <div class="scroll-area">
       <div v-if="steps.length === 0" class="loading">Chargement du parcours...</div>
 
-      <div v-for="(step, index) in steps" :key="step.id" class="step-item">
+      <div
+        v-for="(step, index) in steps"
+        :key="step.id"
+        class="step-item"
+        :data-step-position="step.position"
+      >
         <div
           class="node"
           :class="{
@@ -44,11 +49,21 @@
         </div>
       </div>
     </div>
+
+    <button
+      v-if="showScrollTopButton"
+      class="scroll-top-btn"
+      type="button"
+      aria-label="Revenir en haut"
+      @click="scrollToTop"
+    >
+      ↑
+    </button>
   </main>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import api from '../services/api'
 
@@ -61,15 +76,90 @@ const API_BASE =
   import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
 const BADGE_SEEN_KEY = 'seenUnlockedBadgesCount'
 const BADGES_THRESHOLDS = [25, 60, 100, 180, 260, 400]
+const SCROLL_DURATION = 480
+const SCROLL_TOP_THRESHOLD = 240
 
 // États pour la notification "Toast"
 const showToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref('error')
+const showScrollTopButton = ref(false)
 let toastTimeoutId = null
+let scrollRafId = null
 
 const unlockedCount = computed(() => steps.value.filter((s) => s.isUnlocked).length)
 const calculateOffset = (index) => Math.sin(index * 1.0) * 60
+
+const easeOutCubic = (progress) => 1 - Math.pow(1 - progress, 3)
+
+const animateScrollTo = (targetY, duration = SCROLL_DURATION) => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  if (scrollRafId) {
+    cancelAnimationFrame(scrollRafId)
+  }
+
+  const startY = window.scrollY || window.pageYOffset || 0
+  const distance = targetY - startY
+
+  if (Math.abs(distance) < 2) {
+    window.scrollTo(0, targetY)
+    return
+  }
+
+  const startTime = performance.now()
+
+  const step = (now) => {
+    const elapsed = now - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    const nextY = startY + distance * easeOutCubic(progress)
+
+    window.scrollTo(0, nextY)
+
+    if (progress < 1) {
+      scrollRafId = requestAnimationFrame(step)
+    }
+  }
+
+  scrollRafId = requestAnimationFrame(step)
+}
+
+const updateScrollTopButton = () => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  showScrollTopButton.value = window.scrollY > SCROLL_TOP_THRESHOLD
+}
+
+const scrollToTop = () => {
+  animateScrollTo(0, 420)
+}
+
+const scrollToReachedStep = async () => {
+  await nextTick()
+
+  const targetStep = [...steps.value].reverse().find((step) => step?.isUnlocked) || steps.value[0]
+
+  if (!targetStep || typeof document === 'undefined') {
+    return
+  }
+
+  const targetElement = document.querySelector(
+    `[data-step-position="${targetStep.position}"]`,
+  )
+
+  if (!targetElement) {
+    return
+  }
+
+  const targetY =
+    targetElement.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.22
+
+  animateScrollTo(Math.max(0, targetY), 520)
+}
 
 // Fonction pour déclencher le message joli
 const triggerToast = (msg, type = 'error') => {
@@ -181,10 +271,14 @@ const openBadges = () => {
 }
 
 onMounted(async () => {
+  updateScrollTopButton()
+  window.addEventListener('scroll', updateScrollTopButton, { passive: true })
+
   try {
     const stepsResponse = await api.get('/steps')
     steps.value = stepsResponse.data
     await updateBadgesNotification(stepsResponse.data)
+    await scrollToReachedStep()
 
     if (route.query.validated === 'true') {
       const gainedXp = Number(route.query.gainedXp ?? 0)
@@ -197,6 +291,16 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('Erreur chargement étapes:', error)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('scroll', updateScrollTopButton)
+  }
+
+  if (scrollRafId) {
+    cancelAnimationFrame(scrollRafId)
   }
 })
 </script>
@@ -297,11 +401,17 @@ onMounted(async () => {
   background: #f96750;
   color: v.$text-white;
   border: none;
-  border-radius: 999px;
-  padding: 10px 18px;
-  font-weight: 800;
+  padding: 18px 60px;
+  border-radius: 35px;
+  font-weight: 900;
+  font-size: 1.1rem;
   cursor: pointer;
-  box-shadow: 0 8px 18px rgba(v.$black, 0.2);
+  box-shadow: 0 6px 0 #cc533e;
+
+  &:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #cc533e;
+  }
 }
 
 .badges-dot {
@@ -350,6 +460,9 @@ onMounted(async () => {
     background-color: v.$text-muted;
     border-radius: 50%;
     box-shadow: 0 6px 0 v.$card-border;
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -408,13 +521,44 @@ onMounted(async () => {
   }
 
   &:active:not(.locked) {
-    transform: scale(0.95);
+    .node-circle {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 v.$card-border;
+    }
+  }
+
+  &:active.completed {
+    .node-circle {
+      box-shadow: 0 2px 0 v.$eco-green-mid;
+    }
   }
 }
 
 .loading {
   color: v.$text-muted;
   text-align: center;
+}
+
+.scroll-top-btn {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background: v.$eco-green-dark;
+  color: v.$text-white;
+  font-size: 1.35rem;
+  font-weight: 900;
+  box-shadow: 0 6px 0 v.$eco-green-shadow;
+  cursor: pointer;
+  z-index: 40;
+
+  &:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 v.$eco-green-shadow;
+  }
 }
 
 @media (max-width: 640px) {
@@ -424,12 +568,22 @@ onMounted(async () => {
   }
 
   .badges-link {
-    padding: 10px 14px;
-    font-size: 0.9rem;
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 16px;
+    font-size: 1rem;
   }
 
   .stats {
     font-size: 0.82rem;
+  }
+
+  .scroll-top-btn {
+    right: 14px;
+    bottom: 14px;
+    width: 46px;
+    height: 46px;
+    font-size: 1.15rem;
   }
 }
 </style>
