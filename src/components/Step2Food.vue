@@ -212,3 +212,8 @@ const handleNext = () => {
 }
 </script>
 
+<style lang="scss">
+
+@use '@/assets/styles/pages/_step2food.scss' as *;
+
+</style>

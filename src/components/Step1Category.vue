@@ -41,6 +41,7 @@ const handleNext = () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss">
+@use '@/assets/styles/pages/_step1category.scss' as *;
 
 </style>

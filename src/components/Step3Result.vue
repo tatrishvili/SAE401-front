@@ -105,3 +105,7 @@ const handleSave = async () => {
 }
 </script>
 
+<style lang="scss">
+
+@use '@/assets/styles/pages/_step3result.scss' as *;
+</style>
