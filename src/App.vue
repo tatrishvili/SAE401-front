@@ -1,32 +1,23 @@
 <template>
   <div id="app">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-content">
-        <h1>{{ t('app.title') }}</h1>
-
-        <nav class="nav">
-          <RouterLink to="/">{{ t('nav.home') }}</RouterLink>
-          <RouterLink to="/calculateur">{{ t('nav.calculator') }}</RouterLink>
-        </nav>
-
-        <div class="language-selector">
-          <button @click="changeLocale('fr')" :class="{ active: locale.value === 'fr' }">FR</button>
-          <button @click="changeLocale('en')" :class="{ active: locale.value === 'en' }">EN</button>
-        </div>
-      </div>
-    </header>
+    <!-- Header component -->
+    <Header :t="t" :locale="locale" @change-locale="changeLocale" />
 
     <!-- Main content -->
     <main class="main">
       <RouterView />
     </main>
+
+    <!-- Footer component -->
+    <Footer />
   </div>
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
 
 const { t, locale } = useI18n()
 

@@ -2,7 +2,6 @@
   <div class="step step2">
     <h2>Votre trajet</h2>
 
-    <!-- 1. Choix du transport -->
     <div class="choices">
       <button
           v-for="t in transports"
@@ -15,7 +14,6 @@
     </div>
     <span class="error" v-if="errors.transport">{{ errors.transport }}</span>
 
-    <!-- 2. Distance -->
     <div class="inpuuut">
       <label>Distance (km)</label>
       <input

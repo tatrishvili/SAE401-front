@@ -27,7 +27,7 @@
       />
     </div>
 
-    <!-- Loading -->
+
     <div v-if="loading" class="loading">⏳ Chargement...</div>
     <div v-else-if="apiError" class="error">{{ apiError }}</div>
 
@@ -49,7 +49,6 @@
       </button>
     </div>
 
-    <!-- Selected summary -->
     <div v-if="selectedItems.length > 0" class="selected-summary">
       <h3>🛒 Sélectionnés ({{ selectedItems.length }})</h3>
       <div class="selected-tags">
@@ -75,7 +74,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useApi } from '@/composables/UseApi'
+import { useApi } from '@/composables/useApi'
 
 const props = defineProps(['data'])
 const emit = defineEmits(['next', 'prev'])
@@ -89,10 +88,8 @@ const searchQuery = ref('')
 const selectedItems = ref(props.data.selectedFoods ?? [])
 const validationError = ref('')
 
-// Slugs that belong to "Viandes & Poissons" groups
 const VIANDES_SLUGS = ['viandes', 'poissons']
 
-// Slugs from alimentation that should appear in the Fruits & Légumes tab
 const FRUITS_SLUGS = ['fruits', 'cereales']
 
 const slugToName = (slug) => {
