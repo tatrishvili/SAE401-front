@@ -27,8 +27,8 @@
           :disabled="saving || saved"
       >
         <span v-if="saving">⏳ Enregistrement...</span>
-        <span v-else-if="saved">✅ Enregistré</span>
-        <span v-else>💾 Sauvegarder dans mon profil</span>
+        <span v-else-if="saved">Enregistré</span>
+        <span v-else>Sauvegarder dans mon profil</span>
       </button>
       <p v-if="saveError" class="error">{{ saveError }}</p>
       <p v-if="saved" class="success">Résultat enregistré avec succès !</p>

@@ -1,11 +1,13 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router/index.js'
-import VueApexCharts from 'vue3-apexcharts'
+import router from './router'
+import i18n from './i18n'
+
 import './assets/styles/style.css'
 
 const app = createApp(App)
-app.use(router)
-app.use(VueApexCharts)
-app.mount('#app')
 
+app.use(router)
+app.use(i18n)
+
+app.mount('#app')
