@@ -1,0 +1,23 @@
+@use '../abstracts/variables';
+@use '../abstracts/mixins';
+
+header {
+  text-transform: capitalize;
+  font-size: variables.$subtitle;
+  background-color: variables.$d3;
+  margin: 0 0 1vh 0;
+  height: 10vh;
+  padding: 0 2vh;
+
+  @include mixins.flex-center;
+
+  h1 {
+    margin: 0;
+    text-align: center;
+    flex: 1;
+  }
+
+  .retour {
+    margin-right: auto;
+  }
+}

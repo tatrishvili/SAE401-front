@@ -1,5 +1,5 @@
 <template>
-  <footer>
+  <footer v-if="$route.name === 'Accueil'">
     <RouterLink to="/"><img src="../assets/icones/home.svg" alt=""></RouterLink>
     <RouterLink to="./calculateur"><img src="../assets/icones/advices.svg" alt=""></RouterLink>
     <RouterLink to="/"><img src="../assets/icones/dashboard.svg" alt=""></RouterLink>

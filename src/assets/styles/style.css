@@ -1,55 +1,49 @@
+html {
+  height: 100%;
+  margin: 0;
+}
+
+#app {
+  height: 100%;
+}
+
+main {
+  height: 100%;
+}
+
 body {
   background-color: #222631;
   font-family: "M PLUS Rounded 1c", sans-serif;
-  margin: 0;
   padding: 0;
-  color: #fff;
+  margin: 0;
+  color: #ffffff;
+  height: 100%;
 }
 
 * {
   font-weight: 700;
 }
 
-footer {
-  background-color: #373E4E;
-  position: fixed;
-  bottom: 0;
+button {
+  color: #F96750;
+  all: unset;
   width: 100%;
-  height: 10vh;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  justify-content: space-evenly;
-}
-
-header {
-  text-transform: capitalize;
-  font-size: 2vh;
-  background-color: #373E4E;
-  margin: 0 0 1vh 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-  height: 10vh;
-  padding: 0 2vh;
-}
-header h1 {
-  margin: 0;
+  color: #ffffff;
+  border-radius: 2vh;
   text-align: center;
-  flex: 1;
-}
-header .retour {
-  margin-right: auto;
-}
-
-.accueil {
-  text-align: center;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
   padding: 2vh;
+  box-sizing: border-box;
+  background-color: #F96750;
+  border-right: 0.5vh solid #df4830;
+  border-bottom: 1vh solid #df4830;
+  border-left: 0.5vh solid #df4830;
 }
-.accueil h1 {
-  display: none;
+
+button:active {
+  border: none;
 }
 
 .card {
@@ -63,96 +57,483 @@ header .retour {
   margin: 0;
 }
 .card h2 {
-  font-size: 2vh;
+  font-size: 16px;
 }
 .card p {
   font-size: 14px;
   color: #8792A4;
 }
-
 .card:nth-child(2) {
   height: 25vh;
 }
 
-.btn {
-  all: unset;
-  display: block;
-  color: #fff;
-  background-color: #F96750;
-  border-radius: 1vh;
-  padding: 1.5vh;
+header {
+  text-transform: capitalize;
+  font-size: 27px;
+  background-color: #373E4E;
+  margin: 0 0 1vh 0;
+  height: 10vh;
+  padding: 0 2vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+header h1 {
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+header .retour {
+  margin-right: auto;
 }
 
-.step1 {
+footer {
+  background-color: #373E4E;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 10vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.welcome {
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  max-height: 100vh;
+  padding: 2vh;
+  box-sizing: border-box;
+}
+.welcome h1 {
+  margin: 0;
+  text-align: center;
+  font-weight: normal;
+}
+.welcome h2 {
+  margin: 0;
+  text-align: center;
+  font-weight: normal;
+}
+.welcome p {
+  margin: 0;
+  text-align: center;
+  font-weight: normal;
+}
+.welcome input {
+  margin: 0;
+  text-align: center;
+  font-weight: normal;
+}
+.welcome h1 {
+  font-size: 40px;
+  font-family: "Righteous", sans-serif;
+}
+.welcome p {
+  font-size: 16px;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+}
+.welcome .content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1vh;
+  flex: 1;
+  justify-content: center;
+  gap: 2vh;
+}
+.welcome button {
+  background-color: #F96750;
+}
+
+.accueil {
+  text-align: center;
+  padding: 2vh;
+}
+.accueil h1 {
+  display: none;
+}
+
+.connexion {
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  min-height: 100vh;
+  padding: 2vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.connexion h1 {
+  font-weight: normal;
+}
+.connexion h2 {
+  font-weight: normal;
+}
+.connexion p {
+  font-weight: normal;
+}
+.connexion input {
+  font-weight: normal;
+}
+.connexion h1 {
+  text-align: center;
+  font-size: 27px;
+  font-weight: bold;
+}
+.connexion .content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+}
+.connexion .form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.connexion .form .input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.connexion .form .input-wrapper .input {
+  width: 100%;
+  background-color: #373E4E;
+  border: 0.2vh solid #4E5669;
+  border-radius: 2vh;
+  padding: 2vh;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-size: 16px;
+  color: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+}
+.connexion .form .input-wrapper .input::placeholder {
+  color: #657084;
+}
+.connexion .form .input-wrapper .input:focus {
+  border-color: #8792A4;
+}
+.connexion .form .input-wrapper .toggle-password {
+  display: none;
+}
+.connexion .form .error {
+  color: #F96750;
+  font-size: 14px;
+  margin: 0;
+}
+.connexion .form .forgot {
+  display: flex;
+  justify-content: flex-end;
+}
+.connexion .form .forgot p {
+  font-size: 16px;
+  color: #ffffff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.connexion .span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0;
+}
+.connexion .span-line {
+  flex: 1;
+  height: 0.5px;
+  background-color: #F96750;
+}
+.connexion .span-text {
+  font-size: 16px;
+  color: #ffffff;
+  white-space: nowrap;
+  font-weight: normal;
+}
+.connexion .social-icon {
+  display: none;
+  width: 20px;
+  height: 20px;
+}
+.connexion .button2 {
+  background-color: transparent;
+  border: 1px solid #F96750;
+}
+
+.inscription {
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 2vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.inscription h1 {
+  font-weight: normal;
+}
+.inscription h2 {
+  font-weight: normal;
+}
+.inscription p {
+  font-weight: normal;
+}
+.inscription input {
+  font-weight: normal;
+}
+.inscription h1 {
+  text-align: center;
+  font-size: 27px;
+  font-weight: bold;
+}
+.inscription a {
+  color: #F96750;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.inscription .content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+}
+.inscription p {
+  font-size: 16px;
+  color: #ffffff;
+  text-align: center;
+}
+.inscription .form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.inscription .form .input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.inscription .form .input-wrapper .input {
+  width: 100%;
+  background-color: #373E4E;
+  border: 0.2vh solid #4E5669;
+  border-radius: 2vh;
+  padding: 2vh;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-size: 16px;
+  color: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+}
+.inscription .form .input-wrapper .input::placeholder {
+  color: #657084;
+}
+.inscription .form .input-wrapper .input:focus {
+  border-color: #8792A4;
+}
+.inscription .form .input-wrapper .toggle-password {
+  display: none;
+}
+.inscription .form .error {
+  color: #F96750;
+  font-size: 16px;
+}
+.inscription .form .strength-bar {
+  display: flex;
+  gap: 1vh;
+}
+.inscription .form .strength-bar .strength-segment {
+  flex: 1;
+  height: 0.5vh;
+  border-radius: 1vh;
+  background-color: #4E5669;
+  transition: background-color 0.3s;
+}
+.inscription .form .strength-bar .strength-segment.very-weak {
+  background-color: #e05030;
+}
+.inscription .form .strength-bar .strength-segment.weak {
+  background-color: #f08030;
+}
+.inscription .form .strength-bar .strength-segment.medium {
+  background-color: #f0c030;
+}
+.inscription .form .strength-bar .strength-segment.strong {
+  background-color: #60c070;
+}
+.inscription .form .strength-bar .strength-segment.very-strong {
+  background-color: #30b060;
+}
+.inscription .form .strength-bar .strength-segment.empty {
+  background-color: #3a4555;
+}
+.inscription .form .strength-label {
+  font-size: 14px;
+}
+.inscription .form .strength-label.very-weak {
+  color: #e05030;
+}
+.inscription .form .strength-label.weak {
+  color: #f08030;
+}
+.inscription .form .strength-label.medium {
+  color: #f0c030;
+}
+.inscription .form .strength-label.strong {
+  color: #60c070;
+}
+.inscription .form .strength-label.very-strong {
+  color: #30b060;
+}
+
+.profile-page {
+  min-height: 100vh;
+  padding: 0;
+  background-color: #222631;
+  color: #ffffff;
+}
+.profile-page .header {
+  width: 100%;
+  margin-bottom: 30px;
+  background-color: #373E4E;
+  justify-content: space-between;
+}
+.profile-page .header h1 {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+.profile-page .header .icon-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.profile-page .avatar-section {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.profile-page .avatar-section .avatar-circle {
+  width: 140px;
+  height: 140px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  overflow: hidden;
+}
+.profile-page .avatar-section .avatar-circle img {
+  width: 70%;
+}
+.profile-page .avatar-section .username {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.profile-page .stats-container,
+.profile-page .challenges-container {
+  width: 100%;
+  max-width: 320px;
+}
+.profile-page .card {
+  background-color: #373E4E;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 12px;
+}
+.profile-page .card p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.profile-page .card.challenge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.profile-page .separator {
+  width: 60%;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  margin: 20px 0;
+}
+.profile-page .logout-btn {
+  margin-top: auto;
+  margin-bottom: 20px;
+  background-color: #F96750;
+  color: #ffffff;
+  border: none;
+  padding: 15px;
+  width: 80%;
+  max-width: 250px;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.profile-page .logout-btn:active {
+  opacity: 0.8;
+}
+
+.step3, .step2, .step1 {
   background-color: #373E4E;
   margin: 2vh;
   padding: 3vh;
   border-radius: 2vh;
-  font-size: 2vh;
+  font-size: 16px;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  flex-direction: column;
   text-align: center;
 }
-.step1 .choices {
+.step3 .choices, .step2 .choices, .step1 .choices {
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
 }
-.step1 .choices button {
-  display: flex;
-  background-color: #373E4E;
-  box-shadow: 0;
+.step3 .suivant, .step2 .suivant, .step1 .suivant {
+  all: unset;
+  background-color: #F96750;
   font-size: 18px;
   font-family: "M PLUS Rounded 1c", sans-serif;
-  color: #fff;
+  color: #ffffff;
+  border-radius: 2vh;
+  width: 20vh;
+  padding: 2vh;
+}
+
+.step1 .choices button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #373E4E;
+  font-size: 18px;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  color: #ffffff;
   border: 2px solid #8792A4;
   height: 15vh;
   width: 20vh;
   margin-bottom: 2vh;
-  align-items: center;
-  justify-content: center;
   border-radius: 2vh;
-}
-.step1 .suivant {
-  all: unset;
-  background-color: #F96750;
-  font-size: 18px;
-  font-family: "M PLUS Rounded 1c", sans-serif;
-  color: #fff;
-  border-radius: 2vh;
-  width: 20vh;
-  padding: 2vh;
-  box-shadow: 0;
 }
 
-.step2 {
-  background-color: #373E4E;
-  margin: 2vh;
-  padding: 3vh;
-  border-radius: 2vh;
-  font-size: 2vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-.step2 .choices {
-  display: flex;
-  flex-direction: column;
-}
 .step2 .choices button {
   display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: #373E4E;
-  box-shadow: 0;
   font-size: 18px;
   font-family: "M PLUS Rounded 1c", sans-serif;
-  color: #fff;
+  color: #ffffff;
   border: 2px solid #8792A4;
   height: 7vh;
   width: 20vh;
   margin-bottom: 2vh;
-  align-items: center;
-  justify-content: center;
   border-radius: 2vh;
 }
 .step2 .disparait {
@@ -160,6 +541,8 @@ header .retour {
 }
 .step2 .inpuuut {
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
   margin-bottom: 3vh;
 }
@@ -168,58 +551,29 @@ header .retour {
 }
 .step2 .inpuuut input {
   background-color: #373E4E;
-  border: 2px solid #8792A4;
   border-radius: 1vh;
   font-size: 18px;
   padding: 1.5vh;
-  color: #fff;
-  border: none;
+  color: #ffffff;
   border: 2px solid #657084;
 }
 .step2 .inpuuut input:focus {
   outline: none;
-  border: 3px solid #fff;
-}
-.step2 .suivant {
-  all: unset;
-  background-color: #F96750;
-  font-size: 18px;
-  font-family: "M PLUS Rounded 1c", sans-serif;
-  color: #fff;
-  border-radius: 2vh;
-  width: 20vh;
-  padding: 2vh;
-  box-shadow: 0;
+  border: 3px solid #ffffff;
 }
 
-.step3 {
-  background-color: #373E4E;
-  margin: 2vh;
-  padding: 3vh;
-  border-radius: 2vh;
-  font-size: 2vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-.step3 .choices {
-  display: flex;
-  flex-direction: column;
-}
 .step3 .choices button {
   display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: #373E4E;
-  box-shadow: 0;
   font-size: 18px;
   font-family: "M PLUS Rounded 1c", sans-serif;
-  color: #fff;
+  color: #ffffff;
   border: 2px solid #8792A4;
   height: 15vh;
   width: 20vh;
   margin-bottom: 2vh;
-  align-items: center;
-  justify-content: center;
   border-radius: 2vh;
 }
 .step3 .suivant {

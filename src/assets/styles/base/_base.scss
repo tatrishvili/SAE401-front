@@ -1,0 +1,29 @@
+// _base.scss
+@use '../abstracts/variables' as *;
+
+html{
+  height: 100%;
+  margin: 0;
+}
+
+#app{
+  height: 100%;
+}
+
+main{
+  height: 100%;
+}
+
+body {
+  background-color: $d4;
+  font-family: $text;
+  padding: 0;
+  margin: 0;
+  color: $l1;
+  height: 100%;
+}
+
+* {
+  font-weight: 700;
+}
+
