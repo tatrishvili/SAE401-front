@@ -420,6 +420,7 @@ const heatmapOptions = {
   border-radius: 16px;
   padding: 16px;
   animation: fadeUp 0.5s ease both;
+  flex: 1;
 }
 
 .card-title {
