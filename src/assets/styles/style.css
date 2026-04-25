@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap");
 body {
   background-color: #222631;
   font-family: "M PLUS Rounded 1c", sans-serif;
@@ -86,6 +87,9 @@ footer {
 }
 .accueil h1 {
   display: none;
+}
+.accueil .card {
+  height: auto;
 }
 
 .connexion-screen {
@@ -716,6 +720,105 @@ footer {
   background-color: #e05030;
 }
 
+.dashboard-screen {
+  font-family: "Nunito", sans-serif;
+  background-color: #1e2530;
+  min-height: 100vh;
+  padding: 48px 16px 40px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.dashboard-screen .header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 8px;
+}
+.dashboard-screen .header .back-btn {
+  position: absolute;
+  left: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #c8d0da;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.dashboard-screen .header .back-btn:hover {
+  color: #ffffff;
+}
+.dashboard-screen .header .back-btn svg {
+  width: 22px;
+  height: 22px;
+}
+.dashboard-screen .header .title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+.dashboard-screen .card {
+  background-color: #2a3242;
+  border-radius: 16px;
+  padding: 16px;
+  animation: fadeUp 0.5s ease both;
+  flex: 1;
+}
+.dashboard-screen .card .card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px;
+}
+.dashboard-screen .loader {
+  text-align: center;
+  color: #8792A4;
+  font-size: 0.85rem;
+  padding: 24px 0;
+}
+.dashboard-screen .legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.dashboard-screen .legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dashboard-screen .legend .legend-item .legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dashboard-screen .legend .legend-item .legend-label {
+  font-size: 0.82rem;
+  color: #c8d0da;
+  flex: 1;
+}
+.dashboard-screen .legend .legend-item .legend-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .step3, .step2, .step1 {
   background-color: #373E4E;
   margin: 2vh;
