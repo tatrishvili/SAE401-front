@@ -1,16 +1,8 @@
 // _base.scss
 @use '../abstracts/variables' as *;
 
-html{
-  height: 100%;
+html {
   margin: 0;
-}
-
-#app{
-  height: 100%;
-}
-
-main{
   height: 100%;
 }
 
@@ -20,10 +12,22 @@ body {
   padding: 0;
   margin: 0;
   color: $l1;
-  height: 100%;
+  min-height: 100%;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  // Espace réservé pour la navbar fixe en bas
+  padding-bottom: 12vh;
+  box-sizing: border-box;
 }
 
 * {
   font-weight: 700;
 }
-

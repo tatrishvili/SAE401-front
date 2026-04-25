@@ -58,7 +58,7 @@ const props = defineProps({
     default: () => ({selectedFoods: []}),
   }
 })
-defineEmits(['prev'])
+const emit = defineEmits(['prev', 'reset'])
 
 const { isLoggedIn } = useAuth()
 const { fetchApi } = useApi()
@@ -94,6 +94,7 @@ const handleSave = async () => {
       })
     })
     saved.value = true
+    setTimeout(() => emit('reset', 'Repas enregistré avec succès !'), 800)
   } catch (e) {
     saveError.value = e.message || 'Erreur lors de la sauvegarde'
   } finally {

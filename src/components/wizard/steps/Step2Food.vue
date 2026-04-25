@@ -6,15 +6,15 @@
     <div class="main-tabs">
       <button
           :class="{ active: activeTab === 'viandes' }"
-          @click="activeTab = 'viandes'"
+          @click="switchTab('viandes')"
       > Viandes</button>
       <button
           :class="{ active: activeTab === 'fruitsetlegumes' }"
-          @click="activeTab = 'fruitsetlegumes'"
+          @click="switchTab('fruitsetlegumes')"
       > Fruits & Légumes</button>
       <button
           :class="{ active: activeTab === 'autres' }"
-          @click="activeTab = 'autres'"
+          @click="switchTab('autres')"
       > Autres</button>
     </div>
 
@@ -23,7 +23,7 @@
       <input
           v-model="searchQuery"
           type="text"
-          placeholder="🔍 Rechercher un alimentation..."
+          :placeholder="searchPlaceholder"
       />
     </div>
 
@@ -182,14 +182,35 @@ const filteredItems = computed(() => {
 
 
   if (searchQuery.value.trim()) {
-    const q = searchQuery.value.toLowerCase().trim()
+    const q = normalize(searchQuery.value)
     items = items.filter(i => {
-      const name = i.name.toLowerCase()
+      const name = normalize(i.name)
       return q.length === 1 ? name.startsWith(q) : name.includes(q)
     })
   }
 
   return items
+})
+
+// Normalisation : minuscule + retrait des accents et ligatures (œ → oe)
+const normalize = (str) =>
+    str
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')
+        .replace(/œ/g, 'oe')
+        .replace(/æ/g, 'ae')
+        .trim()
+
+const switchTab = (tab) => {
+  activeTab.value = tab
+  searchQuery.value = ''  // on repart d'une recherche vide pour bien filtrer dans le nouvel onglet
+}
+
+const searchPlaceholder = computed(() => {
+  if (activeTab.value === 'viandes') return '🔍 Rechercher dans Viandes...'
+  if (activeTab.value === 'fruitsetlegumes') return '🔍 Rechercher dans Fruits & Légumes...'
+  return '🔍 Rechercher dans Autres...'
 })
 
 const isSelected = (item) => selectedItems.value.some(s => s.slug === item.slug)

@@ -20,3 +20,9 @@
 @use 'pages/inscription';
 @use 'pages/profil';
 @use 'pages/steps';
+@use 'pages/dashboard';
+
+// Global apexcharts safety: never overflow parent
+.apexcharts-canvas {
+  max-width: 100% !important;
+}
