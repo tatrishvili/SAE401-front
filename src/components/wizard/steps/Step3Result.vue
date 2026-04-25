@@ -48,7 +48,7 @@ const props = defineProps({
     default: () => ({ km: 0, transportId: null }),
   }
 })
-defineEmits(['prev'])
+const emit = defineEmits(['prev', 'reset'])
 
 const { loading, error, fetchApi } = useApi()
 const { isLoggedIn } = useAuth()
@@ -97,6 +97,7 @@ const handleSave = async () => {
       })
     })
     saved.value = true
+    setTimeout(() => emit('reset', 'Trajet enregistré avec succès !'), 800)
   } catch (e) {
     saveError.value = e.message || 'Erreur lors de la sauvegarde'
   } finally {

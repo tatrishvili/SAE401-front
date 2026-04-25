@@ -1,11 +1,38 @@
+@use '../abstracts/variables' as *;
+
 .accueil {
   text-align: center;
   padding: 2vh;
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  box-sizing: border-box;
+  max-width: 100%;
 
   h1 {
     display: none;
   }
+
   .card {
     height: auto;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .btn {
+    display: block;
+    text-decoration: none;
+    background-color: $c1;
+    color: $l1;
+    padding: 1.5vh 2vh;
+    border-radius: 2vh;
+    text-align: center;
+    font-weight: 600;
+    transition: filter 0.18s ease, transform 0.12s ease;
+
+    &:hover { filter: brightness(1.1); }
+    &:active { transform: translateY(2px); filter: brightness(0.9); }
   }
 }

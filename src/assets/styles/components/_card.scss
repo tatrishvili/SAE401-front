@@ -1,11 +1,14 @@
 @use '../abstracts/variables';
 
 .card {
-  background-color:variables.$d3;
+  background-color: variables.$d3;
   border-radius: 2vh;
   margin-bottom: 2vh;
   padding: 2vh;
   text-align: left;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 
   h2, p {
     margin: 0;
@@ -20,7 +23,9 @@
     color: variables.$l5;
   }
 
-  &:nth-child(2) {
-    height: 25vh;
+  // Garde-fou pour les graphiques apexcharts
+  .apexcharts-canvas,
+  .apexcharts-svg {
+    max-width: 100% !important;
   }
 }

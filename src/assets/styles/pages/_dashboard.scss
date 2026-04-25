@@ -60,7 +60,14 @@
     flex: none; /* Allow card to fit content size */
     height: auto !important; /* Override the 25vh set in style.css */
     width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
+
+    .apexcharts-canvas,
+    .apexcharts-svg {
+      max-width: 100% !important;
+    }
 
     .card-title {
       font-size: 0.95rem;
