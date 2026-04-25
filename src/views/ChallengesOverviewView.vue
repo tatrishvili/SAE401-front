@@ -197,11 +197,24 @@ const scrollToReachedStep = async () => {
     `[data-step-position="${targetStep.position}"]`,
   );
   if (!targetElement) return;
+
+  const rect = targetElement.getBoundingClientRect();
+  const headerEl = document.querySelector(".header");
+  const headerHeight = headerEl?.offsetHeight ?? 0;
+
+  // Si l'étape est déjà visible sans cacher le header, ne pas scroller
+  if (rect.top >= headerHeight + 20 && rect.bottom <= window.innerHeight)
+    return;
+
   const targetY =
-    targetElement.getBoundingClientRect().top +
-    window.scrollY -
-    window.innerHeight * 0.22;
-  animateScrollTo(Math.max(0, targetY), 520);
+    rect.top + window.scrollY - window.innerHeight + rect.height + 40;
+  animateScrollTo(
+    Math.max(
+      0,
+      Math.min(targetY, rect.top + window.scrollY - headerHeight - 20),
+    ),
+    520,
+  );
 };
 
 const triggerToast = (msg, type = "error") => {
@@ -341,9 +354,9 @@ onMounted(async () => {
       : (stepsResponse.data?.data ?? []);
     steps.value = stepList;
     const xpValue = await updateBadgesNotification(stepList);
-    await scrollToReachedStep();
 
     if (route.query.validated === "true") {
+      await scrollToReachedStep();
       triggerBadgeCelebration(xpValue);
       const gainedXp = Number(route.query.gainedXp ?? 0);
       const successMessage =
@@ -538,6 +551,9 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 16px;
   margin-bottom: 60px;
+  width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
 }
 
 .badges-link {
@@ -545,12 +561,16 @@ onBeforeUnmount(() => {
   background: v.$c1;
   color: v.$l1;
   border: none;
-  padding: 18px 60px;
+  padding: 12px 20px;
   border-radius: 15px;
   font-weight: 900;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   box-shadow: 0 6px 0 v.$d1;
+  width: 100%;
+  max-width: 260px;
+  box-sizing: border-box;
+  text-align: center;
 }
 .badges-dot {
   position: absolute;
@@ -661,13 +681,15 @@ onBeforeUnmount(() => {
   .header {
     margin-bottom: 28px;
     gap: 12px;
+    padding: 0 6px;
   }
   .scroll-area {
     gap: 34px;
   }
   .badges-link {
-    padding: 16px 42px;
-    font-size: 1rem;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    max-width: 100%;
   }
 }
 </style>

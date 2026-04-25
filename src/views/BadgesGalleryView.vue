@@ -1,7 +1,9 @@
 <template>
   <main class="badges-page">
     <header class="badges-header">
-      <button class="back-btn" @click="$router.push('/home')">Retour</button>
+      <button class="back-btn" @click="$router.push('/challenges')">
+        Retour
+      </button>
       <div>
         <h1>Galerie des Trophées</h1>
         <p>Débloque des badges en progressant dans ton parcours éco.</p>
@@ -208,7 +210,7 @@ onMounted(fetchStats);
 
 .badges-page {
   min-height: 100vh;
-  padding: 34px 18px 48px;
+  padding: 34px 18px 120px;
   color: v.$l1;
   background:
     radial-gradient(circle at 5% 0%, rgba(v.$c1, 0.12), transparent 36%),
@@ -218,18 +220,27 @@ onMounted(fetchStats);
 
 .badges-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
+  flex-wrap: nowrap;
   max-width: 1100px;
   margin: 0 auto 20px;
+}
+.badges-header > div {
+  flex: 1 1 0;
+  min-width: 0;
 }
 .badges-header h1 {
   margin: 0;
   font-size: clamp(1.35rem, 2vw, 2rem);
+  line-height: 1.2;
 }
 .badges-header p {
   margin: 6px 0 0;
   color: v.$l5;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
 }
 .back-btn {
   border: 1px solid v.$d1;
@@ -314,5 +325,27 @@ onMounted(fetchStats);
 }
 .status-text.error {
   color: v.$c2;
+}
+
+@media (max-width: 640px) {
+  .badges-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+  }
+  .badges-header h1 {
+    font-size: 1.3rem;
+  }
+  .badges-header p {
+    font-size: 0.9rem;
+  }
+  .back-btn {
+    align-self: flex-start;
+  }
+  .badges-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
 }
 </style>

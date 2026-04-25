@@ -38,7 +38,11 @@
     </Transition>
 
     <header class="header">
-      <button type="button" class="back-btn" @click="$router.push('/home')">
+      <button
+        type="button"
+        class="back-btn"
+        @click="$router.push('/challenges')"
+      >
         ←
       </button>
       <div class="title-group">
@@ -115,7 +119,7 @@
         <button
           type="button"
           class="btn-back-home"
-          @click="$router.push('/home')"
+          @click="$router.push('/challenges')"
         >
           Retour au parcours
         </button>
@@ -309,6 +313,18 @@ onMounted(async () => {
   color: v.$c1;
   font-weight: bold;
   margin: 5px 0 0;
+}
+.badges-link {
+  background: v.$c1;
+  color: v.$l1;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 15px;
+  font-weight: 900;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 5px 0 v.$d1;
+  white-space: nowrap;
 }
 .challenge-card {
   background: v.$d3;
