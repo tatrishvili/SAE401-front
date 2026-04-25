@@ -144,9 +144,9 @@ const scoreOptions = computed(() => ({
           color: '#ffffff',
           offsetY: -10,
           formatter: (val) => {
-            if (val >= 70) return '🌿 Excellent'
-            if (val >= 40) return '⚡ Correct'
-            return '🔥 À améliorer'
+            if (val >= 70) return 'Excellent'
+            if (val >= 40) return 'Correct'
+            return 'À améliorer'
           }
         }
       }
