@@ -1,0 +1,25 @@
+
+@use '../abstracts/variables' as *;
+
+button {
+  color: $c1;
+  all: unset;
+  width: 100%;
+  color: $l1;
+  border-radius: 2vh;
+  text-align: center;
+  font-family: $text;
+  font-size: $button;
+  font-weight: 600;
+  padding: 2vh;
+  box-sizing: border-box;
+  background-color: $c1;
+  
+  border-right: 0.5vh solid $c2;
+  border-bottom: 1vh solid $c2;
+  border-left: 0.5vh solid $c2;
+}
+
+button:active{
+  border: none;
+}

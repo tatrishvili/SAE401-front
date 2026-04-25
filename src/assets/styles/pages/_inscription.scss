@@ -1,0 +1,126 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as mixins;
+
+.inscription {
+  font-family: $text;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 2vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+    @each $el in $text-elements {
+  #{$el} {
+    font-weight: normal;
+  }
+  }
+
+  h1{
+    text-align: center;
+    font-size: $subtitle;
+    font-weight: bold;
+  }
+  a{
+    color: $c1;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+
+
+
+
+
+  .content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+  }
+
+  p {
+    font-size: $body;
+    color: $l1;
+    text-align: center;
+  }
+
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .input {
+        width: 100%;
+        background-color: $d3;
+        border: 0.2vh solid $d2;
+        border-radius: 2vh;
+        padding: 2vh;
+        font-family: $text;
+        font-size: $body;
+        color: $l1;
+        outline: none;
+        box-sizing: border-box;
+        &::placeholder {
+          color: $d1;
+        }
+        &:focus {
+          border-color: $l5;
+        }
+      }
+
+      .toggle-password {
+        display: none;
+      }
+    }
+
+    .error {
+      color: $c1;
+      font-size: $body;
+    }
+
+
+
+
+
+
+    
+    .strength-bar {
+      display: flex;
+      gap: 1vh;
+
+      .strength-segment {
+        flex: 1;
+        height: 0.5vh;
+        border-radius: 1vh;
+        background-color: $d2;
+        transition: background-color 0.3s;
+
+        &.very-weak   { background-color: #e05030; }
+        &.weak        { background-color: #f08030; }
+        &.medium      { background-color: #f0c030; }
+        &.strong      { background-color: #60c070; }
+        &.very-strong { background-color: #30b060; }
+        &.empty       { background-color: #3a4555; }
+      }
+    }
+
+    .strength-label {
+      font-size: $subbody;
+
+      &.very-weak   { color: #e05030; }
+      &.weak        { color: #f08030; }
+      &.medium      { color: #f0c030; }
+      &.strong      { color: #60c070; }
+      &.very-strong { color: #30b060; }
+    }
+  }
+}

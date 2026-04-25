@@ -1,0 +1,45 @@
+@use './variables';
+
+
+@mixin flex-center($direction: row) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: $direction;
+}
+
+@mixin step-container {
+  background-color: variables.$d3;
+  margin: 2vh;
+  padding: 3vh;
+  border-radius: 2vh;
+  font-size: variables.$body;
+  @include flex-center(column);
+  text-align: center;
+}
+
+@mixin choice-btn($height) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: variables.$d3;
+  font-size: variables.$button;
+  font-family: variables.$text;
+  color: variables.$l1;
+  border: 2px solid variables.$l5;
+  height: $height;
+  width: 20vh;
+  margin-bottom: 2vh;
+  border-radius: 2vh;
+}
+
+@mixin main-btn {
+  all: unset;
+  background-color: variables.$c1;
+  font-size: variables.$button;
+  font-family: variables.$text;
+  color: variables.$l1;
+  border-radius: 2vh;
+  width: 20vh;
+  padding: 2vh;
+}

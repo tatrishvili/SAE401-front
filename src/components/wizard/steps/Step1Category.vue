@@ -1,23 +1,22 @@
 <template>
-  <div>
+  <div class="step step1">
     <h2>Que souhaitez-vous calculer ?</h2>
 
     <div class="choices">
       <button
-        v-for="cat in categories"
-        :key="cat.value"
-        :class="{ selected: local.category === cat.value }"
-        @click="local.category = cat.value"
+          v-for="cat in categories"
+          :key="cat.value"
+          :class="{ selected: local.category === cat.value }"
+          @click="local.category = cat.value"
       >
         {{ cat.icon }} {{ cat.label }}
       </button>
     </div>
     <span class="error" v-if="error">{{ error }}</span>
 
-    <button @click="handleNext">Suivant →</button>
+    <button @click="handleNext" class="suivant">Suivant →</button>
   </div>
 </template>
-
 <script setup>
 import { reactive, ref } from 'vue'
 
@@ -44,8 +43,11 @@ const handleNext = () => {
 
 <style scoped>
 button.selected {
-  background: #22c55e;
-  color: white;
-  border-color: #22c55e;
+  background: #8792A4;
+  color: #373E4E;
+  border-color: #8792A4;
+}
+button {
+  cursor: pointer;
 }
 </style>
