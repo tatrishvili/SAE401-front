@@ -10,17 +10,17 @@ import DashboardView from '@/views/DashboardView.vue'
 
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    { path: '/', component: WelcomeView, name: 'Welcome' },
-    { path: '/connexion', component: ConnexionView, name: "Connexion" },
-    { path: '/inscription', component: InscriptionView, name: "Inscription" },
-    { path: '/home', component: AccueilView, name: 'Accueil'},
-    { path: '/calculateur', component: CalculateurView, name:'Action' },
-    { path: '/dashboard', component: DashboardView, name: 'Dashboard' },
-    { path: '/conseils', component: ConseilsView, name: 'Conseils' },
-    { path: '/profil', component: ProfilView, name:'Profil' },
-  ]
+    history: createWebHistory(),
+    routes: [
+        { path: '/', component: WelcomeView },
+        { path: '/connexion', component: ConnexionView },
+        { path: '/home', component: AccueilView, name: 'Accueil'},
+        { path: '/conseils', component: ConseilsView },
+        { path: '/inscription', component: InscriptionView },
+        { path: '/calculateur', component: CalculateurView, name:'Action' },
+        { path: '/profil', component: ProfilView, name:'Profil' },
+        { path: '/dashboard', component: DashboardView, name: 'Dashboard' },
+    ]
 })
 
 export default router

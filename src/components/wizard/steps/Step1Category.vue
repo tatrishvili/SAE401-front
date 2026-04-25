@@ -4,10 +4,10 @@
 
     <div class="choices">
       <button
-        v-for="cat in categories"
-        :key="cat.value"
-        :class="{ selected: local.category === cat.value }"
-        @click="local.category = cat.value"
+          v-for="cat in categories"
+          :key="cat.value"
+          :class="{ selected: local.category === cat.value }"
+          @click="local.category = cat.value"
       >
         {{ cat.icon }} {{ cat.label }}
       </button>
@@ -17,7 +17,6 @@
     <button @click="handleNext" class="suivant">Suivant →</button>
   </div>
 </template>
-
 <script setup>
 import { reactive, ref } from 'vue'
 
@@ -47,5 +46,8 @@ button.selected {
   background: #8792A4;
   color: #373E4E;
   border-color: #8792A4;
+}
+button {
+  cursor: pointer;
 }
 </style>

@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/api'
+const API_URL = import.meta.env.VITE_API_URL || 'http://symfony.mmi-troyes.fr:8319/api'
 
 // Shared state
 const token = ref(localStorage.getItem('auth_token') || null)

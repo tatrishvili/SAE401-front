@@ -9,7 +9,7 @@ export function useEntries() {
     const loading = ref(false)
     const error = ref(null)
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8319/api'
+    const API_URL = import.meta.env.VITE_API_URL || 'http://symfony.mmi-troyes.fr:8319/api'
 
     const fetchEntries = async () => {
         if (!token.value) return
