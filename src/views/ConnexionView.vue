@@ -107,7 +107,7 @@ async function handleLogin() {
 
   try {
     await login(email.value.trim(), password.value)
-    router.push('/profil')
+    router.push('/home')
   } catch (e) {
     console.error('Erreur connexion :', e)
     apiError.value = e.message || 'Erreur de connexion. Vérifiez vos identifiants.'

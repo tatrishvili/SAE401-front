@@ -37,7 +37,12 @@
       <h3>Badges débloqués</h3>
       <div class="badges-list">
         <div v-for="badge in earnedBadges" :key="badge.id" class="badge">
-          <img :src="badge.src" alt="badge" class="badge-img" />
+          <img
+              :src="badge.imageUrl"
+              :alt="badge.name"
+              class="badge-img"
+              @error="(e) => (e.target.src = defaultBadgeIcon)"
+          />
           <span class="badge-name">{{ badge.name }}</span>
         </div>
         <p v-if="earnedBadges.length === 0" class="no-badges">Aucun badge pour l'instant.</p>
@@ -53,8 +58,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import { useApi } from '@/composables/useApi'
 
 import baseAvatar from '../assets/icones/pdp.png'
+import defaultBadgeIcon from '../assets/icones/badge_mustache.png'
 import crownChoc from '../assets/icones/badge_crown-chocolate_avatar.png'
 import crownBronz from '../assets/icones/badge_crown-bronze_avatar.png'
 import crownSilv from '../assets/icones/badge_crown-silver_avatar.png'
@@ -72,19 +79,31 @@ import badgePir from '../assets/icones/badge_pirate.png'
 
 const router = useRouter()
 const auth = useAuth()
+const { fetchApi } = useApi()
 
-// "name" in the DB is the pseudo the user typed at registration
 const pseudo = computed(() =>
     auth.user.value?.name || auth.user.value?.email || 'Utilisateur'
 )
 
-const userXp = ref(150)
-const joursConnexion = ref(5)
+const userXp = ref(0)
+const joursConnexion = ref(0)
+const earnedBadges = ref([])
 const selectedAvatar = ref(0)
 const isEditingAvatar = ref(false)
 
-onMounted(() => {
-  auth.fetchUserProfile()
+async function loadStats() {
+  try {
+    const stats = await fetchApi('/me/stats')
+    userXp.value = stats.xp ?? 0
+    earnedBadges.value = Array.isArray(stats.badges) ? stats.badges : []
+  } catch (e) {
+    console.error('Impossible de charger les stats utilisateur :', e)
+  }
+}
+
+onMounted(async () => {
+  await auth.fetchUserProfile()
+  await loadStats()
 })
 
 const avatars = [
@@ -123,10 +142,6 @@ const currentAvatarSrc = computed(() => {
   const found = avatars.find(a => a.id === selectedAvatar.value)
   return found ? found.src : avatars[0].src
 })
-
-const earnedBadges = computed(() =>
-    avatars.filter(a => a.type === 'xp' && userXp.value >= a.required)
-)
 
 function handleLogout() {
   auth.logout()
