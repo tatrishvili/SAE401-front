@@ -14,13 +14,20 @@ const router = createRouter({
     routes: [
         { path: '/', component: WelcomeView },
         { path: '/connexion', component: ConnexionView },
-        { path: '/home', component: AccueilView, name: 'Accueil'},
-        { path: '/conseils', component: ConseilsView },
         { path: '/inscription', component: InscriptionView },
-        { path: '/calculateur', component: CalculateurView, name:'Action' },
-        { path: '/profil', component: ProfilView, name:'Profil' },
-        { path: '/dashboard', component: DashboardView, name: 'Dashboard' },
+        { path: '/home', component: AccueilView, name: 'Accueil', meta: { requiresAuth: true } },
+        { path: '/conseils', component: ConseilsView, meta: { requiresAuth: true } },
+        { path: '/calculateur', component: CalculateurView, name: 'Action', meta: { requiresAuth: true } },
+        { path: '/profil', component: ProfilView, name: 'Profil', meta: { requiresAuth: true } },
+        { path: '/dashboard', component: DashboardView, name: 'Dashboard', meta: { requiresAuth: true } },
     ]
+})
+
+router.beforeEach((to) => {
+    const token = localStorage.getItem('auth_token')
+    if (to.meta.requiresAuth && !token) {
+        return { path: '/connexion' }
+    }
 })
 
 export default router

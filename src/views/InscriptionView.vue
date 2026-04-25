@@ -174,7 +174,7 @@ async function handleInscription() {
 
     await login(cleanEmail, cleanPassword)
 
-    router.push('/profile')
+    router.push('/home')
   } catch (e) {
     console.error('Erreur inscription :', e)
     apiError.value = e.message || "Erreur lors de l'inscription"

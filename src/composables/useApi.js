@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 import { useAuth } from './useAuth'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://symfony.mmi-troyes.fr:8319/api'
+import { API_URL } from './apiConfig'
 
 export function useApi() {
     const loading = ref(false)

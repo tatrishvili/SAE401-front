@@ -1,6 +1,7 @@
 // src/composables/useEntries.js
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from './useAuth'
+import { API_URL } from './apiConfig'
 
 export function useEntries() {
     const { token, getAuthHeaders } = useAuth()
@@ -8,8 +9,6 @@ export function useEntries() {
     const rawData = ref([])
     const loading = ref(false)
     const error = ref(null)
-
-    const API_URL = import.meta.env.VITE_API_URL || 'http://symfony.mmi-troyes.fr:8319/api'
 
     const fetchEntries = async () => {
         if (!token.value) return

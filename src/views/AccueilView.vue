@@ -14,11 +14,13 @@
     </div>
     <div class="card defi">
       <h2>Défi du jour</h2>
-      <p>Ne manger qu'une seule fois de la viande.</p>
+      <p v-if="defiDuJour">{{ defiDuJour.description || defiDuJour.title }}</p>
+      <p v-else>Chargement…</p>
     </div>
     <div class="card conseil">
       <h2>Conseil du jour</h2>
-      <p>{{ conseilDuJour }}</p>
+      <p v-if="conseilDuJour">{{ conseilDuJour.text }}</p>
+      <p v-else>Chargement…</p>
     </div>
     <RouterLink to="/calculateur" class="btn">
       Entrer une action
@@ -27,13 +29,25 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import { useApi } from '@/composables/useApi'
 
 const { fetchEntries, isLoggedIn } = useAuth()
+const { fetchApi } = useApi()
 
 const rawData = ref([])
 const chartReady = ref(false)
+const defiDuJour = ref(null)
+const conseilDuJour = ref(null)
+
+function pickDailyItem(items) {
+  if (!Array.isArray(items) || items.length === 0) return null
+  const dayOfYear = Math.floor(
+      (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+  )
+  return items[dayOfYear % items.length]
+}
 
 onMounted(async () => {
   if (isLoggedIn.value) {
@@ -44,6 +58,18 @@ onMounted(async () => {
       console.error('Erreur chargement entrées :', e)
     }
   }
+
+  try {
+    const [challenges, tips] = await Promise.all([
+      fetchApi('/challenges'),
+      fetchApi('/tips')
+    ])
+    defiDuJour.value = pickDailyItem(challenges)
+    conseilDuJour.value = pickDailyItem(tips)
+  } catch (e) {
+    console.error('Erreur chargement défi/conseil :', e)
+  }
+
   chartReady.value = true
 })
 
@@ -59,7 +85,7 @@ const productionToday = computed(() => {
 })
 
 const scoreValue = computed(() => {
-  if (productionToday.value === '--') return 68
+  if (productionToday.value === '--') return 100
   const total = parseFloat(productionToday.value)
   return Math.max(0, Math.min(100, Math.round(100 - total * 5)))
 })
@@ -136,14 +162,6 @@ const scoreOptions = computed(() => ({
   theme: { mode: 'dark' },
 }))
 
-const conseils = [
-  "Manger moins de viande aide à baisser sa production de CO2, et est également bon pour la santé.",
-  "Préférer les transports en commun réduit significativement ton empreinte carbone.",
-  "Éteindre les appareils en veille peut réduire ta consommation électrique de 10%.",
-  "Acheter local et de saison diminue l'impact lié au transport des aliments.",
-]
-
-const conseilDuJour = ref(conseils[Math.floor(Math.random() * conseils.length)])
 </script>
 
 <style></style>

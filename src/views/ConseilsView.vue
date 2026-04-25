@@ -1,16 +1,6 @@
 <template>
   <div class="conseils-screen">
 
-    <!-- Header -->
-    <div class="header">
-      <button class="back-btn" @click="router.back()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M15 18l-6-6 6-6"/>
-        </svg>
-      </button>
-      <h1 class="title">Conseils</h1>
-    </div>
-
     <!-- Accordion -->
     <div class="accordion">
       <div
@@ -43,7 +33,7 @@
           <div v-if="openCategories.includes(category.title)" class="accordion-body">
             <div
               v-for="(conseil, i) in category.conseils"
-              :key="i"
+              :key="conseil.id ?? i"
               class="conseil-item"
               :class="{ 'not-last': i < category.conseils.length - 1 }"
             >
@@ -58,16 +48,26 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import conseils from '@/data/conseils-home.json'
+import { ref, computed, onMounted } from 'vue'
+import { useApi } from '@/composables/useApi'
 
-const router = useRouter()
+const { fetchApi } = useApi()
 
-// Regrouper les conseils par titre (catégorie)
+const conseils = ref([])
+const openCategories = ref([])
+
+onMounted(async () => {
+  try {
+    const data = await fetchApi('/tips')
+    conseils.value = Array.isArray(data) ? data : []
+  } catch (e) {
+    console.error('Erreur chargement conseils :', e)
+  }
+})
+
 const categories = computed(() => {
   const map = {}
-  for (const conseil of conseils) {
+  for (const conseil of conseils.value) {
     if (!map[conseil.title]) {
       map[conseil.title] = { title: conseil.title, conseils: [] }
     }
@@ -75,9 +75,6 @@ const categories = computed(() => {
   }
   return Object.values(map)
 })
-
-// Catégories ouvertes
-const openCategories = ref([])
 
 function toggle(title) {
   const idx = openCategories.value.indexOf(title)

@@ -1,20 +1,12 @@
 <template>
   <div class="dashboard-screen">
 
-    <!-- Header -->
-    <div class="header">
-      <button class="back-btn" @click="router.back()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M15 18l-6-6 6-6"/>
-        </svg>
-      </button>
-      <h1 class="title">Tableau de bord</h1>
-    </div>
-
     <!-- Score du jour -->
     <div class="card">
       <p class="card-title">Score du jour</p>
+      <div v-if="loading" class="loader">Chargement...</div>
       <apexchart
+          v-else
           type="radialBar"
           :options="scoreOptions"
           :series="scoreSeries"
@@ -86,41 +78,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+import { useEntries } from '@/composables/useEntries'
 
-const router = useRouter()
-
-// ─── FETCH API ────────────────────────────────────────────────────
-const rawData = ref([])
-const loading = ref(false)
-
-onMounted(async () => {
-  loading.value = true
-  try {
-    const response = await fetch('https://ton-api-symfony.com/api/actions', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json'
-      }
-    })
-    rawData.value = await response.json()
-  } catch (e) {
-    console.error('Erreur API :', e)
-  } finally {
-    loading.value = false
-  }
-})
-
-// ─── SCORE DU JOUR ────────────────────────────────────────────────
-const scoreSeries = computed(() => {
-  const today = new Date().toISOString().split('T')[0]
-  const todayData = rawData.value.filter(item => item.date === today)
-  if (!todayData.length) return [68]
-  const total = todayData.reduce((sum, item) => sum + item.co2, 0)
-  const score = Math.max(0, Math.min(100, Math.round(100 - total * 5)))
-  return [score]
-})
+const { rawData, loading, scoreSeries } = useEntries()
 
 const scoreOptions = computed(() => ({
   chart: { background: 'transparent', toolbar: { show: false } },
@@ -179,20 +140,20 @@ const scoreOptions = computed(() => ({
 }))
 
 // ─── ACTIONS DU JOUR (Donut) ─────────────────────────────────────
-const donutColors = ['#4ECDC4', '#F6D6D6', '#F96750', '#FFD166', '#8792A4']
+const donutColors = ['#4ECDC4', '#F6D6D6']
 
 const donutSeries = computed(() => {
-  const today = new Date().toISOString().split('T')[0]
-  const categories = ['Transport', 'Alimentation', 'Energie', 'Consommation', 'Déchets']
+  const today = new Date().toLocaleDateString('en-CA')
+  const categories = ['Transport', 'Alimentation']
   return categories.map(cat =>
       rawData.value
-          .filter(item => item.date === today && item.categorie === cat)
+          .filter(item => item.date === today && item.category === cat)
           .reduce((sum, item) => sum + item.co2, 0)
   )
 })
 
 const donutOptions = {
-  labels: ['Transport', 'Alimentation', 'Energie', 'Consommation', 'Déchets'],
+  labels: ['Transport', 'Alimentation'],
   colors: donutColors,
   legend: { show: false },
   dataLabels: { enabled: false },
@@ -229,13 +190,13 @@ const barSeries = computed(() => {
   const derniersSeptJours = Array.from({ length: 7 }, (_, i) => {
     const d = new Date()
     d.setDate(d.getDate() - (6 - i))
-    return d.toISOString().split('T')[0]
+    return d.toLocaleDateString('en-CA')
   })
   return categories.map(cat => ({
     name: cat,
     data: derniersSeptJours.map(date =>
         rawData.value
-            .filter(item => item.date === date && item.categorie === cat)
+            .filter(item => item.date === date && item.category === cat)
             .reduce((sum, item) => sum + item.co2, 0)
     )
   }))
@@ -261,17 +222,17 @@ const barOptions = {
 
 // ─── ÉVOLUTION MENSUELLE (Line) ───────────────────────────────────
 const lineSeries = computed(() => {
-  const categories = ['Transport', 'Alimentation', 'Energie']
+  const categories = ['Transport', 'Alimentation']
   const derniers30Jours = Array.from({ length: 30 }, (_, i) => {
     const d = new Date()
     d.setDate(d.getDate() - (29 - i))
-    return d.toISOString().split('T')[0]
+    return d.toLocaleDateString('en-CA')
   })
   return categories.map(cat => ({
     name: cat,
     data: derniers30Jours.map(date =>
         rawData.value
-            .filter(item => item.date === date && item.categorie === cat)
+            .filter(item => item.date === date && item.category === cat)
             .reduce((sum, item) => sum + item.co2, 0)
     )
   }))
@@ -279,7 +240,7 @@ const lineSeries = computed(() => {
 
 const lineOptions = {
   chart: { background: 'transparent', toolbar: { show: false }, zoom: { enabled: false } },
-  colors: ['#F96750', '#F6D6D6', '#4ECDC4'],
+  colors: ['#4ECDC4', '#F6D6D6'],
   stroke: { curve: 'smooth', width: 2 },
   xaxis: {
     categories: Array.from({ length: 30 }, (_, i) => i + 1),
@@ -296,33 +257,40 @@ const lineOptions = {
 }
 
 // ─── CALENDRIER (Heatmap) ─────────────────────────────────────────
-const heatmapSeries = computed(() => {
-  const jours = ['Dim', 'Sam', 'Ven', 'Jeu', 'Mer', 'Mar', 'Lun']
+// Affiche les 16 dernières semaines, du lundi au dimanche.
+// X = date du lundi de la semaine (DD/MM), Y = jour de la semaine.
+const NB_WEEKS = 16
+const dayLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
+const heatmapSeries = computed(() => {
   const scoreMap = {}
   for (const item of rawData.value) {
-    if (!scoreMap[item.date]) scoreMap[item.date] = 0
-    scoreMap[item.date] += item.co2
+    scoreMap[item.date] = (scoreMap[item.date] || 0) + item.co2
   }
 
-  return jours.map((jour, jourIndex) => {
+  // Lundi de la semaine en cours
+  const today = new Date()
+  const startOfThisWeek = new Date(today)
+  const dow = (today.getDay() + 6) % 7  // 0 = lundi
+  startOfThisWeek.setDate(today.getDate() - dow)
+  startOfThisWeek.setHours(0, 0, 0, 0)
+
+  // dimanche → en haut, lundi → en bas (apex affiche la dernière série en haut)
+  return dayLabels.map((jour, dayIndex) => {
     const data = []
-    const today = new Date()
+    for (let w = NB_WEEKS - 1; w >= 0; w--) {
+      const cellDate = new Date(startOfThisWeek)
+      cellDate.setDate(startOfThisWeek.getDate() - w * 7 + dayIndex)
+      const dateStr = cellDate.toLocaleDateString('en-CA')
 
-    for (let semaine = 15; semaine >= 0; semaine--) {
-      const date = new Date(today)
-      const diff = semaine * 7 + (today.getDay() - (6 - jourIndex))
-      date.setDate(today.getDate() - diff)
-
-      const dateStr = date.toISOString().split('T')[0]
       const co2 = scoreMap[dateStr] ?? 0
       const score = co2 === 0 ? 0 : Math.max(0, Math.min(100, Math.round(100 - co2 * 5)))
 
-      data.push({ x: `S${16 - semaine}`, y: score })
+      const xLabel = cellDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
+      data.push({ x: xLabel, y: score, date: dateStr })
     }
-
     return { name: jour, data }
-  })
+  }).reverse()
 })
 
 const heatmapOptions = {
@@ -346,7 +314,14 @@ const heatmapOptions = {
     }
   },
   xaxis: {
-    labels: { show: false },
+    type: 'category',
+    labels: {
+      show: true,
+      rotate: -45,
+      rotateAlways: true,
+      style: { colors: '#8792A4', fontSize: '9px' },
+      hideOverlappingLabels: true,
+    },
     axisBorder: { show: false },
     axisTicks: { show: false },
   },
