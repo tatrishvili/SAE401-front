@@ -1,0 +1,120 @@
+@use "../abstracts/_variables.scss" as *;
+@use "../abstracts/_mixins.scss" as mixins;
+
+.conseils-screen {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 2vh 2vh 14vh;
+  background:
+    radial-gradient(circle at top, rgba(78, 205, 196, 0.16), transparent 34%),
+    linear-gradient(180deg, #1f2531 0%, #222631 100%);
+  color: $l1;
+
+  .header {
+    @include mixins.flex-center;
+    justify-content: space-between;
+    margin-bottom: 2vh;
+    gap: 1rem;
+
+    .back-btn {
+      width: 4.8vh;
+      height: 4.8vh;
+      min-width: 4.8vh;
+      border-radius: 50%;
+      background: rgba(55, 62, 78, 0.95);
+      border: 1px solid rgba(78, 205, 196, 0.35);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: $l1;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .title {
+      flex: 1;
+      margin: 0;
+      text-align: center;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      color: $l1;
+    }
+  }
+
+  .accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4vh;
+  }
+
+  .accordion-item {
+    background: rgba(55, 62, 78, 0.96);
+    border: 1px solid rgba(135, 146, 164, 0.18);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+    animation: slide-up 0.35s ease both;
+  }
+
+  .accordion-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: transparent;
+    border: none;
+    padding: 1.6vh 1.8vh;
+    text-align: left;
+
+    .accordion-title {
+      font-size: 1.05rem;
+      color: $l1;
+    }
+
+    .accordion-icon {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
+      transition: transform 0.25s ease;
+
+      &.rotated {
+        transform: rotate(180deg);
+      }
+    }
+
+    &.open {
+      background: linear-gradient(90deg, rgba(78, 205, 196, 0.08), transparent);
+    }
+  }
+
+  .accordion-body {
+    padding: 0 1.8vh 1.8vh;
+  }
+
+  .conseil-item {
+    padding: 1.2vh 0;
+    color: $d1;
+
+    &.not-last {
+      border-bottom: 1px solid rgba(135, 146, 164, 0.12);
+    }
+
+    p {
+      margin: 0;
+      line-height: 1.55;
+      color: $l1;
+      font-weight: 500;
+    }
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
