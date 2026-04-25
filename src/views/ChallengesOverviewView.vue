@@ -63,8 +63,12 @@
     </header>
 
     <div class="scroll-area">
-      <div v-if="steps.length === 0" class="loading">
-        Chargement du parcours...
+      <div v-if="stepsLoading" class="loading">Chargement du parcours...</div>
+      <div v-else-if="stepsError" class="loading error">
+        {{ stepsError }}
+      </div>
+      <div v-else-if="steps.length === 0" class="loading">
+        Aucune étape disponible pour le moment.
       </div>
 
       <div
@@ -118,6 +122,8 @@ import {
 } from "@/services/badges";
 
 const steps = ref([]);
+const stepsLoading = ref(true);
+const stepsError = ref("");
 const router = useRouter();
 const route = useRoute();
 const hasNewBadges = ref(false);
@@ -262,7 +268,8 @@ const computeUnlockedByXp = (xpValue) =>
   BADGES_THRESHOLDS.filter((threshold) => xpValue >= threshold).length;
 
 const resolveXpForNotification = async (stepsData) => {
-  const token = localStorage.getItem("token");
+  const token =
+    localStorage.getItem("auth_token") || localStorage.getItem("token");
   try {
     const response = await fetch(`${API_BASE}/me/stats`, {
       headers: {
@@ -318,6 +325,15 @@ onMounted(async () => {
   updateScrollTopButton();
   window.addEventListener("scroll", updateScrollTopButton, { passive: true });
 
+  const token =
+    localStorage.getItem("auth_token") || localStorage.getItem("token");
+  if (!token) {
+    stepsLoading.value = false;
+    stepsError.value = "Vous devez être connecté pour accéder au parcours.";
+    setTimeout(() => router.push("/connexion"), 2000);
+    return;
+  }
+
   try {
     const stepsResponse = await api.get("/steps");
     const stepList = Array.isArray(stepsResponse.data)
@@ -339,6 +355,15 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error("Erreur chargement étapes:", error);
+    if (error?.response?.status === 401) {
+      stepsError.value = "Session expirée. Veuillez vous reconnecter.";
+      setTimeout(() => router.push("/connexion"), 2000);
+    } else {
+      stepsError.value =
+        "Impossible de charger le parcours. Vérifiez votre connexion.";
+    }
+  } finally {
+    stepsLoading.value = false;
   }
 });
 

@@ -55,33 +55,68 @@ const router = createRouter({
       path: "/profil",
       name: "Profil",
       component: ProfilView,
-      meta: { title: "Profil", showHeader: true, showFooter: true },
+      meta: {
+        title: "Profil",
+        showHeader: true,
+        showFooter: true,
+        requiresAuth: true,
+      },
     },
     {
       path: "/dashboard",
       name: "Dashboard",
       component: DashboardView,
-      meta: { title: "Dashboard", showHeader: false, showFooter: true },
+      meta: {
+        title: "Dashboard",
+        showHeader: false,
+        showFooter: true,
+        requiresAuth: true,
+      },
     },
     {
       path: "/challenges",
       name: "ChallengesOverview",
       component: ChallengesOverviewView,
-      meta: { title: "Parcours", showHeader: false, showFooter: true },
+      meta: {
+        title: "Parcours",
+        showHeader: false,
+        showFooter: true,
+        requiresAuth: true,
+      },
     },
     {
       path: "/challenges/:id",
       name: "Challenges",
       component: ChallengesView,
-      meta: { title: "Défis", showHeader: false, showFooter: true },
+      meta: {
+        title: "Défis",
+        showHeader: false,
+        showFooter: true,
+        requiresAuth: true,
+      },
     },
     {
       path: "/badges",
       name: "Badges",
       component: BadgesGalleryView,
-      meta: { title: "Badges", showHeader: false, showFooter: true },
+      meta: {
+        title: "Badges",
+        showHeader: false,
+        showFooter: true,
+        requiresAuth: true,
+      },
     },
   ],
+});
+
+router.beforeEach((to, from, next) => {
+  const token =
+    localStorage.getItem("auth_token") || localStorage.getItem("token");
+  if (to.meta.requiresAuth && !token) {
+    next("/connexion");
+  } else {
+    next();
+  }
 });
 
 export default router;
