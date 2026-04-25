@@ -5,7 +5,7 @@
       <h2>Production quotidienne : <span>-- kg CO2</span></h2>
     </div>
 
-    <div class="card graphique">
+    <div class="card">
       <apexchart
         type="radialBar"
         :options="scoreOptions"
