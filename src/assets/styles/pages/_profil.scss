@@ -1,115 +1,252 @@
-// pages/_profil.scss
-@use '../abstracts/variables';
-@use '../abstracts/mixins';
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
 .profile-page {
-  // @include flex-center(column);
-  min-height: 100vh;
-  padding: 0;
-  background-color: variables.$d4;
-  color: variables.$l1;
+  font-family: 'Nunito', sans-serif;
+  background-color: #1e2530;
+  width: 100%;
+  padding: 40px 16px 100px 16px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
 
-  // ---------------- HEADER ----------------
-  .header {
-    width: 100%;
-    margin-bottom: 30px;
-    background-color: variables.$d3;
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
 
-    // @include flex-center;
-    justify-content: space-between;
+  .avatar-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
 
-    h1 {
-      font-size: 1.5rem;
-      font-weight: 500;
-    }
-
-    .icon-btn {
-      background: none;
-      border: none;
-      color: variables.$l1;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-  }
-
-  // ---------------- AVATAR ----------------
-  .avatar-section {
-    text-align: center;
-    margin-bottom: 30px;
-
-    .avatar-circle {
-      width: 140px;
-      height: 140px;
-      background-color: variables.$l1;
+    .edit-avatar-btn {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #2a3242;
+      border: 2px solid #4ECDC4;
       border-radius: 50%;
-      margin: 0 auto 15px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
 
-      // @include flex-center;
-      overflow: hidden;
+      &:hover {
+        transform: scale(1.1);
+      }
 
       img {
-        width: 70%;
+        width: 16px;
+        height: 16px;
+        filter: invert(1);
       }
     }
 
-    .username {
-      font-size: 1.2rem;
-      font-weight: 600;
+    .avatar-circle {
+      width: 100px;
+      height: 100px;
+      background-color: #4ECDC4;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      border: 4px solid #2a3242;
+
+      img {
+        width: 80%;
+        height: auto;
+        object-fit: contain;
+      }
     }
   }
 
-  // ---------------- CONTAINERS ----------------
-  .stats-container,
-  .challenges-container {
-    width: 100%;
-    max-width: 320px;
+  .username {
+    font-size: 1.4rem;
+    margin: 0 0 4px 0;
   }
 
-  // ---------------- CARD ----------------
-  .card {
-    background-color: variables.$d3;
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 12px;
+  .xp-text {
+    color: #4CAF50;
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
 
-    p {
-      margin: 0;
-      font-size: 0.9rem;
+/* AVATAR PICKER */
+.card {
+  background-color: #2a3242;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: left;
+}
+
+.avatar-picker {
+  width: 100%;
+  max-width: 400px;
+  max-height: 55vh;
+  overflow-y: auto;
+  margin-bottom: 24px;
+  padding-bottom: 50px;
+  animation: fadeDown 0.3s ease;
+  -webkit-overflow-scrolling: touch;
+
+  h3 {
+    margin: 0 0 12px 0;
+    font-size: 1.1rem;
+    color: #c8d0da;
+  }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.avatars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 16px;
+}
+
+.avatar-option {
+  position: relative;
+  aspect-ratio: 1;
+  background-color: #1e2530;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  transition: all 0.2s;
+
+  img {
+    width: 70%;
+    height: auto;
+  }
+
+  &.selected {
+    border-color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.2);
+  }
+
+  &:hover:not(.locked) {
+    border-color: #4ECDC4;
+    transform: scale(1.05);
+  }
+
+  &.locked {
+    cursor: not-allowed;
+    opacity: 0.6;
+
+    img {
+      filter: grayscale(100%);
     }
+  }
 
-    &.challenge {
+  .lock-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+
+    span {
+      font-size: 0.75rem;
+      color: #F96750;
+      margin-top: 4px;
+    }
+  }
+}
+
+/* BADGES */
+.badges-container {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 24px;
+
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+    color: #c8d0da;
+    text-align: left;
+  }
+
+  .badges-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+
+    .badge {
+      background-color: #2a3242;
+      padding: 8px 12px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      border: 1px solid #373E4E;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      .badge-img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+      }
+
+      .badge-name {
+        font-size: 0.9rem;
+        font-weight: bold;
+      }
     }
   }
 
-  // ---------------- SEPARATOR ----------------
-  .separator {
-    width: 60%;
-    border: 0;
-    border-top: 1px solid rgba(variables.$l1, 0.3);
-    margin: 20px 0;
+  .no-badges {
+    color: #8792A4;
+    font-style: italic;
   }
+}
 
-  // ---------------- LOGOUT BUTTON ----------------
-  .logout-btn {
-    margin-top: auto;
-    margin-bottom: 20px;
+/* LOGOUT */
+.logout-btn {
+  background-color: #F96750;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 12px 32px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: auto;
+  transition: background-color 0.2s;
+  width: 100%;
+  max-width: 400px;
 
-    background-color: variables.$c1;
-    color: variables.$l1;
-    border: none;
-    padding: 15px;
-    width: 80%;
-    max-width: 250px;
-    border-radius: 15px;
-    font-weight: bold;
-    font-size: 1rem;
-    cursor: pointer;
-
-    &:active {
-      opacity: 0.8;
-    }
+  &:hover {
+    background-color: #e05030;
   }
 }
