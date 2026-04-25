@@ -83,59 +83,45 @@
       </div>
     </div>
 
-    <!-- Contenu Challenges -->
+    <!-- Contenu Challenges — Parcours Zigzag -->
     <div v-else class="tab-content">
       <div v-if="challengesLoading" class="loading-state">
         <div class="spinner"></div>
-        <p>Chargement des défis...</p>
+        <p>Chargement du parcours...</p>
       </div>
       <div v-else-if="challengesError" class="error-state">
         <p>⚠️ {{ challengesError }}</p>
       </div>
       <div v-else-if="steps.length === 0" class="empty-state">
-        <p>Aucun défi disponible pour le moment.</p>
+        <p>Aucune étape disponible pour le moment.</p>
       </div>
-      <div v-else class="challenges-list">
+      <div v-else class="path-scroll-area">
         <div
-          v-for="step in steps"
+          v-for="(step, index) in steps"
           :key="step.id"
-          class="challenge-card"
-          :class="{
-            locked: !step.isUnlocked,
-            completed: step.isCompleted,
-            treasure: isTreasureStep(step.position),
-          }"
-          @click="goToStep(step)"
+          class="path-step-item"
+          :data-step-position="step.position"
         >
-          <div class="challenge-badge">
-            <span v-if="isTreasureStep(step.position)" class="badge-icon"
-              >🏆</span
-            >
-            <span v-else class="badge-number">{{ step.position }}</span>
-          </div>
-          <div class="challenge-info">
-            <h3 class="challenge-title">
-              {{ step.title || `Jour ${step.position}` }}
-            </h3>
-            <div class="challenge-meta">
-              <span v-if="step.isCompleted" class="status completed"
-                >✓ Complété</span
+          <div
+            class="path-node"
+            :class="{
+              locked: !step.isUnlocked,
+              completed: step.isCompleted,
+              treasure: isTreasureStep(step.position),
+            }"
+            :style="{ transform: `translateX(${Math.sin(index * 1) * 60}px)` }"
+            @click="goToStep(step)"
+          >
+            <div class="path-node-circle">
+              <span
+                v-if="isTreasureStep(step.position)"
+                class="path-treasure-icon"
+                >🏆</span
               >
-              <span v-else-if="step.isUnlocked" class="status unlocked"
-                >🔓 Disponible</span
-              >
-              <span v-else class="status locked">🔒 Verrouillé</span>
+              <span v-else class="path-step-number">{{ step.position }}</span>
+              <span v-if="!step.isUnlocked" class="path-lock-icon">🔒</span>
+              <span v-if="step.isCompleted" class="path-check-icon">✓</span>
             </div>
-          </div>
-          <div class="challenge-arrow">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-            >
-              <path d="M9 18l6-6-6-6" />
-            </svg>
           </div>
         </div>
       </div>

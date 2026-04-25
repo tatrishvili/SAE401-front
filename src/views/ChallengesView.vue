@@ -421,6 +421,60 @@ onMounted(async () => {
 .btn-back-home {
   width: 100%;
 }
+
+/* ── Responsive mobile ── */
+@media (max-width: 640px) {
+  .challenge-page {
+    padding: 20px 16px;
+  }
+  .header {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .back-btn {
+    padding: 8px 14px;
+    font-size: 1rem;
+    border-radius: 12px;
+  }
+  .title-group h1 {
+    font-size: 1.5rem;
+  }
+  .subtitle,
+  .status-done {
+    font-size: 0.8rem;
+  }
+  .challenge-card {
+    padding: 16px;
+    border-radius: 18px;
+    margin-bottom: 14px;
+  }
+  .challenge-card h3 {
+    font-size: 1.1rem;
+  }
+  .challenge-card p {
+    font-size: 0.9rem;
+    margin-bottom: 14px;
+  }
+  .card-actions {
+    gap: 8px;
+  }
+  .status-btn {
+    padding: 12px 8px;
+    font-size: 0.85rem;
+  }
+  .icon-circle {
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+  }
+  .category {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+  }
+  .actions-area {
+    margin-top: 20px;
+  }
+}
 .custom-toast {
   position: fixed;
   top: 14px;
