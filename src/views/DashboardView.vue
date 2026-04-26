@@ -1,7 +1,5 @@
 <template>
   <div class="dashboard-screen">
-
-    <!-- Header -->
     <div class="header">
       <button class="back-btn" @click="router.back()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -11,113 +9,127 @@
       <h1 class="title">Tableau de bord</h1>
     </div>
 
-    <div class="card">
-      <p class="card-title">Score du jour</p>
-      <apexchart
-          type="radialBar"
-          :options="scoreOptions"
-          :series="scoreSeries"
-          height="220"
-      />
+    <div v-if="loading || !isReady" class="loader">
+      <div class="spinner"></div>
+      <p>Chargement de vos données...</p>
     </div>
 
-    <!-- Actions du jour (Donut) -->
-    <div class="card">
-      <p class="card-title">Actions du jour</p>
-      <div v-if="loading" class="loader">Chargement...</div>
-      <template v-else>
+    <template v-else>
+      <div class="card summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Aujourd'hui</span>
+          <span class="summary-value">{{ summary.daily.toFixed(1) }}<small> kg</small></span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Cette semaine</span>
+          <span class="summary-value">{{ summary.weekly.toFixed(1) }}<small> kg</small></span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Ce mois</span>
+          <span class="summary-value">{{ summary.monthly.toFixed(1) }}<small> kg</small></span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Cette année</span>
+          <span class="summary-value">{{ summary.yearly.toFixed(1) }}<small> kg</small></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Score du jour</p>
         <apexchart
+            v-if="scoreSeries.length"
+            type="radialBar"
+            :options="scoreOptions"
+            :series="scoreSeries"
+            height="220"
+        />
+      </div>
+
+      <div class="card">
+        <p class="card-title">Répartition du jour</p>
+        <apexchart
+            v-if="donutSeries.some(v => v > 0)"
             type="donut"
             :options="donutOptions"
             :series="donutSeries"
             height="260"
         />
+        <div v-else class="empty-chart">Pas de données aujourd'hui</div>
+
         <div class="legend">
-          <div v-for="(label, i) in donutOptions.labels" :key="i" class="legend-item">
-            <span class="legend-dot" :style="{ backgroundColor: donutColors[i] }" />
+          <div v-for="(label, i) in CATEGORY_LABELS" :key="i" class="legend-item">
+            <span class="legend-dot" :style="{ backgroundColor: donutColors[i] }"/>
             <span class="legend-label">{{ label }}</span>
-            <span class="legend-value">{{ donutSeries[i] }} kg</span>
+            <span class="legend-value">{{ (donutSeries[i] || 0).toFixed(1) }} kg</span>
           </div>
         </div>
-      </template>
-    </div>
+      </div>
 
-    <!-- Actions de la semaine (Bar) -->
-    <div class="card">
-      <p class="card-title">Actions de la semaine</p>
-      <div v-if="loading" class="loader">Chargement...</div>
-      <apexchart
-          v-else
-          type="bar"
-          :options="barOptions"
-          :series="barSeries"
-          height="200"
-      />
-    </div>
+      <div class="card">
+        <p class="card-title">Transport vs Repas (7j)</p>
+        <apexchart type="bar" :options="barOptions" :series="barSeries" height="200" />
+      </div>
 
-    <!-- Évolution mensuelle (Line) -->
-    <div class="card">
-      <p class="card-title">Évolution mensuelle</p>
-      <div v-if="loading" class="loader">Chargement...</div>
-      <apexchart
-          v-else
-          type="line"
-          :options="lineOptions"
-          :series="lineSeries"
-          height="200"
-      />
-    </div>
+      <div class="card">
+        <p class="card-title">Évolution sur 30 jours</p>
+        <apexchart type="line" :options="lineOptions" :series="lineSeries" height="200" />
+      </div>
 
-    <!-- Calendrier (Heatmap) -->
-    <div class="card">
-      <p class="card-title">Calendrier</p>
-      <div v-if="loading" class="loader">Chargement...</div>
-      <apexchart
-          v-else
-          type="heatmap"
-          :options="heatmapOptions"
-          :series="heatmapSeries"
-          height="180"
-      />
-    </div>
+      <div class="card">
+        <p class="card-title">Calendrier d'activité</p>
+        <apexchart type="heatmap" :options="heatmapOptions" :series="heatmapSeries" height="200" />
+      </div>
 
+      <div v-if="rawData.length === 0" class="empty-state">
+        <p>📊 Aucune donnée pour l'instant.</p>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { useApi } from '@/composables/useApi.js'
 
 const router = useRouter()
+const { loading, fetchApi } = useApi()
+const isReady = ref(false)
 
-// ─── FETCH API ────────────────────────────────────────────────────
+// ─── STATE ───
 const rawData = ref([])
-const loading = ref(false)
+const summary = ref({ daily: 0, weekly: 0, monthly: 0, yearly: 0 })
 
+const CATEGORIES = ['transport', 'repas']
+const CATEGORY_LABELS = ['Transport', 'Alimentation']
+const donutColors = ['#4ECDC4', '#FFD166']
+
+// ─── FETCH ───
 onMounted(async () => {
-  loading.value = true
   try {
-    const response = await fetch('https://ton-api-symfony.com/api/actions', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json'
-      }
-    })
-    rawData.value = await response.json()
+    const data = await fetchApi('/stats')
+    rawData.value = data.entries ?? []
+    summary.value = data.summary ?? { daily: 0, weekly: 0, monthly: 0, yearly: 0 }
+
+    // Attendre que Vue injecte le HTML avant d'autoriser ApexCharts
+    await nextTick()
+    isReady.value = true
   } catch (e) {
-    console.error('Erreur API :', e)
-  } finally {
-    loading.value = false
+    console.error('Erreur dashboard:', e)
   }
 })
 
-// ─── SCORE DU JOUR ────────────────────────────────────────────────
+// ─── HELPERS ───
+const todayStr = () => new Date().toLocaleDateString('en-CA')
+const lastNDays = (n) => Array.from({ length: n }, (_, i) => {
+  const d = new Date(); d.setDate(d.getDate() - (n - 1 - i));
+  return d.toLocaleDateString('en-CA')
+})
+
+// ─── CALCULS DES SERIES (Gardés inchangés mais sécurisés) ───
+
 const scoreSeries = computed(() => {
-  const today = new Date().toISOString().split('T')[0]
-  const todayData = rawData.value.filter(item => item.date === today)
-  if (!todayData.length) return [68]
-  const total = todayData.reduce((sum, item) => sum + item.co2, 0)
-  const score = Math.max(0, Math.min(100, Math.round(100 - total * 5)))
+  const score = Math.max(0, Math.min(100, Math.round(100 - (summary.value.daily || 0) * 5)))
   return [score]
 })
 
@@ -125,295 +137,168 @@ const scoreOptions = computed(() => ({
   chart: { background: 'transparent', toolbar: { show: false } },
   plotOptions: {
     radialBar: {
-      startAngle: -135,
-      endAngle: 135,
+      startAngle: -135, endAngle: 135,
       hollow: { size: '60%' },
-      track: { background: '#373E4E', strokeWidth: '100%' },
+      track: { background: '#373E4E' },
       dataLabels: {
-        name: {
-          show: true,
-          fontSize: '14px',
-          color: '#8792A4',
-          offsetY: 20,
-          formatter: () => "aujourd'hui"
-        },
+        name: { show: true, fontSize: '14px', color: '#8792A4', offsetY: 20 },
         value: {
-          fontSize: '24px',
-          fontWeight: 800,
-          color: '#ffffff',
-          offsetY: -10,
-          formatter: (val) => {
-            if (val >= 70) return 'Excellent'
-            if (val >= 40) return 'Correct'
-            return 'À améliorer'
-          }
+          fontSize: '22px', fontWeight: 800, color: '#ffffff', offsetY: -10,
+          formatter: (val) => val >= 70 ? 'Top' : val >= 40 ? 'Moyen' : 'Bof'
         }
       }
     }
   },
-  fill: {
-    type: 'gradient',
-    gradient: {
-      shade: 'dark',
-      type: 'horizontal',
-      colorStops: (() => {
-        const val = scoreSeries.value[0]
-        if (val >= 70) return [
-          { offset: 0,   color: '#4CAF50', opacity: 1 },
-          { offset: 100, color: '#81C784', opacity: 1 },
-        ]
-        if (val >= 40) return [
-          { offset: 0,   color: '#FFD166', opacity: 1 },
-          { offset: 100, color: '#FFB347', opacity: 1 },
-        ]
-        return [
-          { offset: 0,   color: '#F96750', opacity: 1 },
-          { offset: 100, color: '#e05030', opacity: 1 },
-        ]
-      })()
-    }
-  },
-  stroke: { lineCap: 'round' },
-  theme: { mode: 'dark' },
+  fill: { colors: [scoreSeries.value[0] >= 70 ? '#4CAF50' : '#F96750'] },
+  theme: { mode: 'dark' }
 }))
 
-// ─── ACTIONS DU JOUR (Donut) ─────────────────────────────────────
-const donutColors = ['#4ECDC4', '#F6D6D6', '#F96750', '#FFD166', '#8792A4']
-
 const donutSeries = computed(() => {
-  const today = new Date().toISOString().split('T')[0]
-  const categories = ['Transport', 'Alimentation', 'Energie', 'Consommation', 'Déchets']
-  return categories.map(cat =>
+  const t = todayStr()
+  return CATEGORIES.map(cat =>
       rawData.value
-          .filter(item => item.date === today && item.categorie === cat)
+          .filter(item => item.date === t && item.category === cat)
           .reduce((sum, item) => sum + item.co2, 0)
   )
 })
 
-const donutOptions = {
-  labels: ['Transport', 'Alimentation', 'Energie', 'Consommation', 'Déchets'],
+const donutOptions = computed(() => ({
+  labels: CATEGORY_LABELS,
   colors: donutColors,
   legend: { show: false },
-  dataLabels: { enabled: false },
   stroke: { width: 0 },
-  plotOptions: {
-    pie: {
-      donut: {
-        size: '65%',
-        labels: {
-          show: true,
-          total: {
-            show: true,
-            label: 'Total',
-            color: '#8792A4',
-            fontSize: '14px',
-            formatter: (w) => {
-              const sum = w.globals.seriesTotals.reduce((a, b) => a + b, 0)
-              return sum.toFixed(1) + ' kg'
-            }
-          },
-          value: { color: '#ffffff', fontSize: '20px', fontWeight: 700 }
-        }
-      }
-    }
-  },
-  tooltip: { y: { formatter: (val) => val + ' kg CO₂' } },
-  theme: { mode: 'dark' },
-  chart: { background: 'transparent', toolbar: { show: false } }
-}
+  plotOptions: { pie: { donut: { size: '70%' } } },
+  theme: { mode: 'dark' }
+}))
 
-// ─── ACTIONS DE LA SEMAINE (Bar) ─────────────────────────────────
 const barSeries = computed(() => {
-  const categories = ['Transport', 'Alimentation']
-  const derniersSeptJours = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date()
-    d.setDate(d.getDate() - (6 - i))
-    return d.toISOString().split('T')[0]
-  })
-  return categories.map(cat => ({
-    name: cat,
-    data: derniersSeptJours.map(date =>
+  const days = lastNDays(7)
+  return CATEGORIES.map((cat, idx) => ({
+    name: CATEGORY_LABELS[idx],
+    data: days.map(date =>
         rawData.value
-            .filter(item => item.date === date && item.categorie === cat)
-            .reduce((sum, item) => sum + item.co2, 0)
+            .filter(item => item.date === date && item.category === cat)
+            .reduce((sum, item) => sum + (item.co2 || 0), 0)
     )
   }))
 })
 
 const barOptions = {
-  chart: { background: 'transparent', toolbar: { show: false }, stacked: false },
-  colors: ['#4ECDC4', '#F6D6D6'],
-  plotOptions: { bar: { borderRadius: 4, columnWidth: '55%' } },
-  xaxis: {
-    categories: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-    labels: { style: { colors: '#8792A4' } },
-    axisBorder: { show: false },
-    axisTicks: { show: false },
-  },
-  yaxis: { labels: { style: { colors: '#8792A4' } } },
-  grid: { borderColor: '#373E4E', strokeDashArray: 4 },
-  legend: { show: false },
-  dataLabels: { enabled: false },
-  tooltip: { theme: 'dark', y: { formatter: (val) => val + ' kg' } },
-  theme: { mode: 'dark' },
+  chart: { background: 'transparent', toolbar: { show: false }, stacked: true },
+  colors: donutColors,
+  xaxis: { categories: ['L', 'M', 'M', 'J', 'V', 'S', 'D'], labels: { style: { colors: '#8792A4' } } },
+  theme: { mode: 'dark' }
 }
 
-// ─── ÉVOLUTION MENSUELLE (Line) ───────────────────────────────────
 const lineSeries = computed(() => {
-  const categories = ['Transport', 'Alimentation', 'Energie']
-  const derniers30Jours = Array.from({ length: 30 }, (_, i) => {
-    const d = new Date()
-    d.setDate(d.getDate() - (29 - i))
-    return d.toISOString().split('T')[0]
-  })
-  return categories.map(cat => ({
-    name: cat,
-    data: derniers30Jours.map(date =>
+  const days = lastNDays(30)
+  return CATEGORIES.map((cat, idx) => ({
+    name: CATEGORY_LABELS[idx],
+    data: days.map(date =>
         rawData.value
-            .filter(item => item.date === date && item.categorie === cat)
-            .reduce((sum, item) => sum + item.co2, 0)
+            .filter(item => item.date === date && item.category === cat)
+            .reduce((sum, item) => sum + (item.co2 || 0), 0)
     )
   }))
 })
 
 const lineOptions = {
-  chart: { background: 'transparent', toolbar: { show: false }, zoom: { enabled: false } },
-  colors: ['#F96750', '#F6D6D6', '#4ECDC4'],
+  chart: { background: 'transparent', toolbar: { show: false } },
+  colors: donutColors,
   stroke: { curve: 'smooth', width: 2 },
-  xaxis: {
-    categories: Array.from({ length: 30 }, (_, i) => i + 1),
-    labels: { show: false },
-    axisBorder: { show: false },
-    axisTicks: { show: false },
-  },
-  yaxis: { labels: { style: { colors: '#8792A4' } } },
-  grid: { borderColor: '#373E4E', strokeDashArray: 4 },
-  legend: { show: false },
-  dataLabels: { enabled: false },
-  tooltip: { theme: 'dark', y: { formatter: (val) => val + ' kg' } },
-  theme: { mode: 'dark' },
+  xaxis: { labels: { show: false } },
+  theme: { mode: 'dark' }
 }
 
-// ─── CALENDRIER (Heatmap) ─────────────────────────────────────────
 const heatmapSeries = computed(() => {
-  const jours = ['Dim', 'Sam', 'Ven', 'Jeu', 'Mer', 'Mar', 'Lun']
-
   const scoreMap = {}
-  for (const item of rawData.value) {
-    if (!scoreMap[item.date]) scoreMap[item.date] = 0
-    scoreMap[item.date] += item.co2
-  }
+  rawData.value.forEach(item => { scoreMap[item.date] = (scoreMap[item.date] || 0) + item.co2 })
+  const today = new Date()
+  const start = new Date(today); start.setDate(today.getDate() - ((today.getDay() + 6) % 7))
 
-  return jours.map((jour, jourIndex) => {
+  return ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((jour, dIdx) => {
     const data = []
-    const today = new Date()
-
-    for (let semaine = 15; semaine >= 0; semaine--) {
-      const date = new Date(today)
-      const diff = semaine * 7 + (today.getDay() - (6 - jourIndex))
-      date.setDate(today.getDate() - diff)
-
-      const dateStr = date.toISOString().split('T')[0]
-      const co2 = scoreMap[dateStr] ?? 0
-      const score = co2 === 0 ? 0 : Math.max(0, Math.min(100, Math.round(100 - co2 * 5)))
-
-      data.push({ x: `S${16 - semaine}`, y: score })
+    for (let w = 10; w >= 0; w--) {
+      const cellDate = new Date(start)
+      cellDate.setDate(start.getDate() - w * 7 + dIdx)
+      const co2 = scoreMap[cellDate.toLocaleDateString('en-CA')] ?? 0
+      data.push({ x: '.', y: co2 === 0 ? 0 : Math.max(1, 100 - co2 * 5) })
     }
-
     return { name: jour, data }
-  })
+  }).reverse()
 })
 
 const heatmapOptions = {
-  chart: { background: 'transparent', toolbar: { show: false }, zoom: { enabled: false } },
-  dataLabels: { enabled: false },
-  colors: ['#4CAF50'],
-  plotOptions: {
-    heatmap: {
-      radius: 3,
-      enableShades: true,
-      shadeIntensity: 0.8,
-      colorScale: {
-        ranges: [
-          { from: 0,  to: 0,   color: '#222631', name: 'Aucune donnée' },
-          { from: 1,  to: 30,  color: '#F96750', name: 'À améliorer' },
-          { from: 31, to: 60,  color: '#FFD166', name: 'Correct' },
-          { from: 61, to: 80,  color: '#81C784', name: 'Bien' },
-          { from: 81, to: 100, color: '#4CAF50', name: 'Excellent' },
-        ]
-      }
-    }
-  },
-  xaxis: {
-    labels: { show: false },
-    axisBorder: { show: false },
-    axisTicks: { show: false },
-  },
-  yaxis: {
-    labels: { style: { colors: '#8792A4', fontSize: '10px' } }
-  },
-  grid: { show: false },
-  legend: { show: false },
-  tooltip: {
-    theme: 'dark',
-    y: {
-      formatter: (val) => {
-        if (val === 0) return 'Aucune donnée'
-        if (val <= 30) return `Score ${val} — À améliorer`
-        if (val <= 60) return `Score ${val} — Correct`
-        if (val <= 80) return `Score ${val} — Bien`
-        return `Score ${val} — Excellent`
-      }
-    }
-  },
-  theme: { mode: 'dark' },
+  chart: { background: 'transparent', toolbar: { show: false } },
+  plotOptions: { heatmap: { colorScale: { ranges: [
+          { from: 0, to: 0, color: '#222631' },
+          { from: 1, to: 100, color: '#4CAF50' }
+        ]}}},
+  theme: { mode: 'dark' }
 }
 </script>
 
 <style lang="scss" scoped>
 .dashboard-screen {
+  background-color: #1e2530;
+  min-height: 100vh;
+  padding-bottom: 120px;
+  color: white;
 
   .header {
-    button.back-btn {
-      all: unset !important;
-      position: absolute !important;
-      left: 0 !important;
+    background-color: #373E4E;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky; top: 0; z-index: 100;
 
+    .title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff !important; /* Force le blanc */
+      margin: 0;
+    }
 
-      width: 44px !important;
-      height: 44px !important;
-      background: transparent !important;
-      background-color: transparent !important;
-
-      border: none !important;
-      border-bottom: none !important;
-      border-right: none !important;
-      border-left: none !important;
-
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      cursor: pointer !important;
-      color: #c8d0da !important;
-
-      svg {
-        width: 24px;
-        height: 24px;
-        stroke: currentColor !important;
-        fill: none !important;
-        flex-shrink: 0;
-      }
-
-      &:hover {
-        color: #ffffff !important;
-        background: transparent !important;
-      }
+    .back-btn {
+      all: unset;
+      position: absolute; left: 16px;
+      color: #ffffff; cursor: pointer;
+      svg { width: 24px; height: 24px; }
     }
   }
 
   .card {
-    height: auto !important;
-    background-color: #2a3242 !important;
+    background-color: #2a3242;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 16px;
+    .card-title { font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 12px; }
+  }
+
+  .summary-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    .summary-item {
+      display: flex; flex-direction: column;
+      .summary-label { font-size: 0.7rem; color: #8792A4; text-transform: uppercase; }
+      .summary-value { font-size: 1.3rem; font-weight: 800; color: white; }
+    }
+  }
+
+  .empty-chart {
+    text-align: center;
+    padding: 20px;
+    color: #8792A4;
+    font-size: 0.8rem;
+  }
+
+  .loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 0;
+    color: #8792A4;
   }
 }
 </style>

@@ -7,28 +7,38 @@
     </div>
     <div class="card">
       <apexchart
-        v-if="chartReady"
-        type="radialBar"
-        :options="scoreOptions"
-        :series="scoreSeries"
-        height="220"
+          v-if="chartReady"
+          type="radialBar"
+          :options="scoreOptions"
+          :series="scoreSeries"
+          height="220"
       />
     </div>
     <div class="card defi">
       <h2>Défi du jour</h2>
       <p>Ne manger qu'une seule fois de la viande.</p>
+      <RouterLink to="/challenges" class="btn"> Voir les défis du jour </RouterLink>
     </div>
     <div class="card conseil">
       <h2>Conseil du jour</h2>
       <p>{{ conseilDuJour }}</p>
     </div>
-    <RouterLink to="/calculateur" class="btn"> Entrer une action </RouterLink>
-    <RouterLink to="/badges" class="btn"> Voir mes badges </RouterLink>
+
+    <!-- ✅ Two buttons side by side -->
+    <div class="bottom-actions">
+      <RouterLink to="/calculateur" class="btn-action btn-orange">
+        ➕ Entrer une action
+      </RouterLink>
+      <RouterLink to="/badges" class="btn-action btn-teal">
+        🏅 Voir les badges
+      </RouterLink>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useAuth } from "@/composables/useAuth";
 
 const { fetchEntries, isLoggedIn } = useAuth();
@@ -51,11 +61,11 @@ onMounted(async () => {
 const productionToday = computed(() => {
   const today = new Date().toISOString().split("T")[0];
   const total = rawData.value
-    .filter((entry) => {
-      const entryDay = (entry.entryDate ?? entry.date ?? "").substring(0, 10);
-      return entryDay === today;
-    })
-    .reduce((sum, entry) => sum + (entry.co2Value ?? entry.co2 ?? 0), 0);
+      .filter((entry) => {
+        const entryDay = (entry.entryDate ?? entry.date ?? "").substring(0, 10);
+        return entryDay === today;
+      })
+      .reduce((sum, entry) => sum + (entry.co2Value ?? entry.co2 ?? 0), 0);
   return total > 0 ? total.toFixed(3) : "--";
 });
 
@@ -145,8 +155,92 @@ const conseils = [
 ];
 
 const conseilDuJour = ref(
-  conseils[Math.floor(Math.random() * conseils.length)],
+    conseils[Math.floor(Math.random() * conseils.length)],
 );
 </script>
 
-<style></style>
+<style scoped>
+.accueil {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  padding: 2vh 2vh 40vh 2vh;
+  box-sizing: border-box;
+}
+
+h1{
+  color:white;
+}
+/* Small button inside defi card */
+.card.defi .btn {
+  display: inline-block;
+  width: auto;
+  margin-top: 1.5vh;
+  padding: 0.8vh 2.5vh;
+  font-size: 13px;
+  border-radius: 50px;
+  text-decoration: none;
+  color: #ffffff;
+  background-color: #F96750;
+  border-right: 0.3vh solid #df4830;
+  border-bottom: 0.6vh solid #df4830;
+  border-left: 0.3vh solid #df4830;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ✅ Row container for the two bottom buttons */
+.bottom-actions {
+  display: flex;
+  gap: 2vw;
+  width: 100%;
+}
+
+/* ✅ Shared base style for both buttons */
+.btn-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2vh 1vh;
+  font-size: 15px;
+  border-radius: 2vh;
+  text-decoration: none;
+  text-align: center;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  color: #ffffff;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  box-sizing: border-box;
+}
+
+.btn-action:active {
+  transform: scale(0.97);
+}
+
+/* ✅ Orange — Entrer une action */
+.btn-orange {
+  background-color: #F96750;
+  border-right: 0.5vh solid #df4830;
+  border-bottom: 1vh solid #df4830;
+  border-left: 0.5vh solid #df4830;
+}
+.btn-orange:hover {
+  background-color: #e0502a;
+}
+
+/* ✅ Teal — Voir les badges */
+.btn-teal {
+  background-color: #55974d;
+  border-right: 0.5vh solid #438c37;
+  border-bottom: 1vh solid #375721;
+  border-left: 0.5vh solid #193317;
+  color: #ffffff;
+}
+.btn-teal:hover {
+  background-color: #325a19;
+  color: #ffffff;
+}
+</style>

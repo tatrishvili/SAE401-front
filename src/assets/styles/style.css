@@ -1,34 +1,50 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap");
 
-html {
+/* ============================================
+   BASE LAYOUT
+   ============================================ */
+
+html, body {
     height: 100%;
     margin: 0;
-}
-
-#app {
-    height: 100%;
-}
-
-main {
-    height: 100%;
+    padding: 0;
+    overflow: hidden; /* body never scrolls — main does */
 }
 
 body {
     background-color: #222631;
     font-family: "M PLUS Rounded 1c", sans-serif;
-    padding: 0;
-    margin: 0;
     color: #ffffff;
-    height: 100%;
 }
 
 * {
     font-weight: 700;
+    box-sizing: border-box;
 }
 
+#app {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* main is the ONE scrollable container */
+main {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* ============================================
+   GLOBAL BUTTON
+   ============================================ */
+
 button {
-    color: #F96750;
     all: unset;
     width: 100%;
     color: #ffffff;
@@ -43,11 +59,60 @@ button {
     border-right: 0.5vh solid #df4830;
     border-bottom: 1vh solid #df4830;
     border-left: 0.5vh solid #df4830;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+button:hover {
+    background-color: #e0502a;
 }
 
 button:active {
     border: none;
+    transform: scale(0.98);
 }
+
+/* ============================================
+   GLOBAL HEADER
+   ============================================ */
+
+header {
+    background-color: #373E4E;
+    height: 10vh;
+    min-height: 56px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin: 0 0 2vh 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+header h1 {
+    margin: 0;
+    text-align: center;
+    flex: 1;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    text-transform: capitalize;
+}
+
+header .retour {
+    margin-right: auto;
+}
+
+/* ============================================
+   GLOBAL CARD
+   ============================================ */
 
 .card {
     background-color: #373E4E;
@@ -56,80 +121,74 @@ button:active {
     padding: 2vh;
     text-align: left;
 }
-.card h2, .card p {
-    margin: 0;
-}
-.card h2 {
-    font-size: 16px;
-}
-.card p {
-    font-size: 14px;
-    color: #8792A4;
-}
-.card:nth-child(2) {
-    height: 25vh;
-}
+.card h2, .card p { margin: 0; }
+.card h2 { font-size: 16px; }
+.card p { font-size: 14px; color: #8792A4; }
 
-header {
-    text-transform: capitalize;
-    font-size: 27px;
-    background-color: #373E4E;
-    margin: 0 0 1vh 0;
-    height: 10vh;
-    padding: 0 2vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-}
-header h1 {
-    margin: 0;
-    text-align: center;
-    flex: 1;
-}
-header .retour {
-    margin-right: auto;
-}
+/* ============================================
+   FOOTER
+   ============================================ */
 
 footer {
     background-color: #373E4E;
-    position: fixed;
-    bottom: 0;
+    flex-shrink: 0;
     width: 100%;
     height: 10vh;
+    min-height: 56px;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
     justify-content: space-evenly;
+    align-items: center;
+    position: relative;
+    z-index: 50;
 }
+
+/* ============================================
+   BTN (RouterLink)
+   ============================================ */
+
+.btn {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #F96750;
+    color: #ffffff !important;
+    text-decoration: none;
+    text-align: center;
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 2vh;
+    border-radius: 2vh;
+    border-right: 0.5vh solid #df4830;
+    border-bottom: 1vh solid #df4830;
+    border-left: 0.5vh solid #df4830;
+    margin-bottom: 2vh;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+}
+.btn:active { border: none; }
+
+/* ============================================
+   WELCOME
+   ============================================ */
 
 .welcome {
     font-family: "M PLUS Rounded 1c", sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
-    max-height: 100vh;
+    min-height: 100%;
     padding: 2vh;
-    box-sizing: border-box;
 }
-.welcome h1,
-.welcome h2,
-.welcome p,
-.welcome input {
+.welcome h1, .welcome h2, .welcome p, .welcome input {
     margin: 0;
     text-align: center;
     font-weight: normal;
 }
-.welcome h1 {
-    font-size: 40px;
-    font-family: "Righteous", sans-serif;
-}
-.welcome p {
-    font-size: 16px;
-    font-family: "M PLUS Rounded 1c", sans-serif;
-}
+.welcome h1 { font-size: 40px; font-family: "Righteous", sans-serif; }
+.welcome p { font-size: 16px; }
 .welcome .content {
     display: flex;
     flex-direction: column;
@@ -138,55 +197,41 @@ footer {
     flex: 1;
     justify-content: center;
 }
-.welcome button {
-    background-color: #F96750;
-}
+.welcome button { background-color: #F96750; }
+
+/* ============================================
+   ACCUEIL
+   ============================================ */
 
 .accueil {
-    text-align: center;
-    padding: 2vh;
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    padding: 2vh 2vh 30vh 2vh;
+    box-sizing: border-box;
+    min-height: 100%;
 }
-.accueil h1 {
-    display: none;
-}
+.accueil h1 { display: none; }
+.accueil .card { height: auto; }
+
+/* ============================================
+   CONNEXION
+   ============================================ */
 
 .connexion {
     font-family: "M PLUS Rounded 1c", sans-serif;
-    min-height: 100vh;
-    padding: 2vh;
-    box-sizing: border-box;
+    min-height: 100%;
+    padding: 2vh 2vh 20vh 2vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
-.connexion h1,
-.connexion h2,
-.connexion p,
-.connexion input {
-    font-weight: normal;
-}
-.connexion h1 {
-    text-align: center;
-    font-size: 27px;
-    font-weight: bold;
-}
-.connexion .content {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 2vh;
-}
-.connexion .form {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-.connexion .form .input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
+.connexion h1, .connexion h2, .connexion p, .connexion input { font-weight: normal; }
+.connexion h1 { text-align: center; font-size: 27px; font-weight: bold; }
+.connexion .content { width: 100%; display: flex; flex-direction: column; gap: 2vh; }
+.connexion .form { display: flex; flex-direction: column; gap: 14px; }
+.connexion .form .input-wrapper { position: relative; display: flex; align-items: center; }
 .connexion .form .input-wrapper .input {
     width: 100%;
     background-color: #373E4E;
@@ -199,104 +244,38 @@ footer {
     outline: none;
     box-sizing: border-box;
 }
-.connexion .form .input-wrapper .input::placeholder {
-    color: #657084;
-}
-.connexion .form .input-wrapper .input:focus {
-    border-color: #8792A4;
-}
-.connexion .form .input-wrapper .toggle-password {
-    display: none;
-}
-.connexion .form .error {
-    color: #F96750;
-    font-size: 14px;
-    margin: 0;
-}
-.connexion .form .forgot {
-    display: flex;
-    justify-content: flex-end;
-}
-.connexion .form .forgot p {
-    font-size: 16px;
-    color: #ffffff;
-    text-decoration: underline;
-    cursor: pointer;
-}
-.connexion .span {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 4px 0;
-}
-.connexion .span-line {
-    flex: 1;
-    height: 0.5px;
-    background-color: #F96750;
-}
-.connexion .span-text {
-    font-size: 16px;
-    color: #ffffff;
-    white-space: nowrap;
-    font-weight: normal;
-}
-.connexion .social-icon {
-    display: none;
-    width: 20px;
-    height: 20px;
-}
-.connexion .button2 {
-    background-color: transparent;
-    border: 1px solid #F96750;
-}
+.connexion .form .input-wrapper .input::placeholder { color: #657084; }
+.connexion .form .input-wrapper .input:focus { border-color: #8792A4; }
+.connexion .form .input-wrapper .toggle-password { display: none; }
+.connexion .form .error { color: #F96750; font-size: 14px; margin: 0; }
+.connexion .form .forgot { display: flex; justify-content: flex-end; }
+.connexion .form .forgot p { font-size: 16px; color: #ffffff; text-decoration: underline; cursor: pointer; }
+.connexion .span { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+.connexion .span-line { flex: 1; height: 0.5px; background-color: #F96750; }
+.connexion .span-text { font-size: 16px; color: #ffffff; white-space: nowrap; font-weight: normal; }
+.connexion .social-icon { display: none; width: 20px; height: 20px; }
+.connexion .button2 { background-color: transparent; border: 1px solid #F96750; }
+
+/* ============================================
+   INSCRIPTION
+   ============================================ */
 
 .inscription {
     font-family: "M PLUS Rounded 1c", sans-serif;
-    min-height: 100vh;
-    box-sizing: border-box;
-    padding: 2vh;
+    min-height: 100%;
+    padding: 2vh 2vh 20vh 2vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
-.inscription h1,
-.inscription h2,
-.inscription p,
-.inscription input {
-    font-weight: normal;
-}
-.inscription h1 {
-    text-align: center;
-    font-size: 27px;
-    font-weight: bold;
-}
-.inscription a {
-    color: #F96750;
-    text-decoration: underline;
-    cursor: pointer;
-}
-.inscription .content {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 2vh;
-}
-.inscription p {
-    font-size: 16px;
-    color: #ffffff;
-    text-align: center;
-}
-.inscription .form {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-.inscription .form .input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
+.inscription h1, .inscription h2, .inscription p, .inscription input { font-weight: normal; }
+.inscription h1 { text-align: center; font-size: 27px; font-weight: bold; }
+.inscription a { color: #F96750; text-decoration: underline; cursor: pointer; }
+.inscription .content { width: 100%; display: flex; flex-direction: column; gap: 2vh; }
+.inscription p { font-size: 16px; color: #ffffff; text-align: center; }
+.inscription .form { display: flex; flex-direction: column; gap: 14px; }
+.inscription .form .input-wrapper { position: relative; display: flex; align-items: center; }
 .inscription .form .input-wrapper .input {
     width: 100%;
     background-color: #373E4E;
@@ -309,29 +288,14 @@ footer {
     outline: none;
     box-sizing: border-box;
 }
-.inscription .form .input-wrapper .input::placeholder {
-    color: #657084;
-}
-.inscription .form .input-wrapper .input:focus {
-    border-color: #8792A4;
-}
-.inscription .form .input-wrapper .toggle-password {
-    display: none;
-}
-.inscription .form .error {
-    color: #F96750;
-    font-size: 16px;
-}
-.inscription .form .strength-bar {
-    display: flex;
-    gap: 1vh;
-}
+.inscription .form .input-wrapper .input::placeholder { color: #657084; }
+.inscription .form .input-wrapper .input:focus { border-color: #8792A4; }
+.inscription .form .input-wrapper .toggle-password { display: none; }
+.inscription .form .error { color: #F96750; font-size: 16px; }
+.inscription .form .strength-bar { display: flex; gap: 1vh; }
 .inscription .form .strength-bar .strength-segment {
-    flex: 1;
-    height: 0.5vh;
-    border-radius: 1vh;
-    background-color: #4E5669;
-    transition: background-color 0.3s;
+    flex: 1; height: 0.5vh; border-radius: 1vh;
+    background-color: #4E5669; transition: background-color 0.3s;
 }
 .inscription .form .strength-bar .strength-segment.very-weak { background-color: #e05030; }
 .inscription .form .strength-bar .strength-segment.weak { background-color: #f08030; }
@@ -347,15 +311,15 @@ footer {
 .inscription .form .strength-label.very-strong { color: #30b060; }
 
 /* ============================================
-   PROFILE PAGE — friend's design
+   PROFILE PAGE
    ============================================ */
 
 .profile-page {
     font-family: "Nunito", sans-serif;
     background-color: #1e2530;
-    min-height: 100vh;
+    min-height: 100%;
     width: 100%;
-    padding: 40px 16px 100px 16px;
+    padding: 40px 16px 200px 16px;
     color: #ffffff;
     display: flex;
     flex-direction: column;
@@ -397,9 +361,7 @@ footer {
     transition: transform 0.2s;
     padding: 0;
 }
-.profile-page .edit-avatar-btn:hover {
-    transform: scale(1.1);
-}
+.profile-page .edit-avatar-btn:hover { transform: scale(1.1); }
 .profile-page .edit-avatar-btn img {
     width: 16px;
     height: 16px;
@@ -474,10 +436,7 @@ footer {
     overflow: hidden;
     transition: all 0.2s;
 }
-.profile-page .avatar-option img {
-    width: 70%;
-    height: auto;
-}
+.profile-page .avatar-option img { width: 70%; height: auto; }
 .profile-page .avatar-option.selected {
     border-color: #4CAF50;
     background-color: rgba(76, 175, 80, 0.2);
@@ -486,13 +445,8 @@ footer {
     border-color: #4ECDC4;
     transform: scale(1.05);
 }
-.profile-page .avatar-option.locked {
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-.profile-page .avatar-option.locked img {
-    filter: grayscale(100%);
-}
+.profile-page .avatar-option.locked { cursor: not-allowed; opacity: 0.6; }
+.profile-page .avatar-option.locked img { filter: grayscale(100%); }
 .profile-page .lock-overlay {
     position: absolute;
     inset: 0;
@@ -539,22 +493,10 @@ footer {
     border: 1px solid #373E4E;
     transition: transform 0.2s ease;
 }
-.profile-page .badge:hover {
-    transform: translateY(-2px);
-}
-.profile-page .badge-img {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-}
-.profile-page .badge-name {
-    font-size: 0.9rem;
-    font-weight: bold;
-}
-.profile-page .no-badges {
-    color: #8792A4;
-    font-style: italic;
-}
+.profile-page .badge:hover { transform: translateY(-2px); }
+.profile-page .badge-img { width: 32px; height: 32px; object-fit: contain; }
+.profile-page .badge-name { font-size: 0.9rem; font-weight: bold; }
+.profile-page .no-badges { color: #8792A4; font-style: italic; }
 
 .profile-page .logout-btn {
     all: unset;
@@ -571,18 +513,247 @@ footer {
     box-sizing: border-box;
     text-align: center;
     transition: background-color 0.2s;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
 }
-.profile-page .logout-btn:hover {
-    background-color: #e05030;
-}
+.profile-page .logout-btn:hover { background-color: #e05030; }
 
-@keyframes profileFadeDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to   { opacity: 1; transform: translateY(0); }
+/* ============================================
+   DASHBOARD
+   ============================================ */
+
+.dashboard-screen {
+    font-family: "Nunito", sans-serif;
+    background-color: #1e2530;
+    min-height: 100%;
+    padding: 0 16px 160px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-sizing: border-box;
+}
+.dashboard-screen .header {
+    background-color: #373E4E;
+    height: 10vh;
+    min-height: 56px;
+    padding: 0 16px;
+    margin: 0 -16px 8px -16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+    width: calc(100% + 32px);
+    box-sizing: border-box;
+}
+.dashboard-screen .header .title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    text-align: center;
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    text-transform: capitalize;
+    flex: 1;
+}
+.dashboard-screen .header .back-btn {
+    all: unset !important;
+    position: absolute !important;
+    left: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    color: #c8d0da !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: none !important;
+    border-right: none !important;
+    border-left: none !important;
+    padding: 0 !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
+}
+.dashboard-screen .header .back-btn:hover { color: #ffffff !important; }
+.dashboard-screen .header .back-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; }
+.dashboard-screen .card { background-color: #2a3242 !important; border-radius: 16px; height: auto !important; }
+.dashboard-screen .card .card-title { font-size: 0.95rem; font-weight: 700; color: #ffffff; margin: 0 0 4px; }
+.dashboard-screen .loader { text-align: center; color: #8792A4; font-size: 0.85rem; padding: 24px 0; }
+.dashboard-screen .legend { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.dashboard-screen .legend .legend-item { display: flex; align-items: center; gap: 10px; }
+.dashboard-screen .legend .legend-item .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.dashboard-screen .legend .legend-item .legend-label { font-size: 0.82rem; color: #c8d0da; flex: 1; }
+.dashboard-screen .legend .legend-item .legend-value { font-size: 0.82rem; font-weight: 700; color: #ffffff; }
+
+/* ============================================
+   CONSEILS
+   ============================================ */
+
+.conseils-screen {
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    background-color: #222631;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.conseils-screen .header {
+    background-color: #373E4E;
+    height: 10vh;
+    min-height: 56px;
+    padding: 0 16px;
+    margin: 0 0 2vh 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+.conseils-screen .header .title,
+.conseils-screen .header h1 {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    text-align: center !important;
+    font-family: "M PLUS Rounded 1c", sans-serif !important;
+    text-transform: capitalize !important;
+    color: #ffffff !important;
+    flex: 1;
+}
+.conseils-screen .header .back-btn {
+    all: unset !important;
+    position: absolute !important;
+    left: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    color: #c8d0da !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: none !important;
+    border-right: none !important;
+    border-left: none !important;
+    padding: 0 !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
+}
+.conseils-screen .header .back-btn:hover { color: #ffffff !important; }
+.conseils-screen .header .back-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; }
+.conseils-screen .tabs-menu {
+    display: flex;
+    gap: 12px;
+    padding: 0 16px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+.conseils-screen .tab-btn {
+    all: unset;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #4E5669;
+    background-color: #373E4E;
+    color: #8792A4;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    pointer-events: auto;
+}
+.conseils-screen .tab-btn.active {
+    background-color: #F96750;
+    border-color: #F96750;
+    color: #ffffff;
+}
+.conseils-screen .tab-content {
+    padding: 0 16px 30vh 16px;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ============================================
-   STEPS (calculator wizard)
+   PATH / CHALLENGES
+   ============================================ */
+
+main.path-container {
+    min-height: unset;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 10px 180px 10px;
+    background-color: #222631;
+    color: #ffffff;
+    box-sizing: border-box;
+}
+main.path-container .header {
+    background-color: #373E4E !important;
+    height: 10vh !important;
+    min-height: 56px !important;
+    padding: 0 16px !important;
+    margin: 0 -10px 30px -10px !important;
+    width: calc(100% + 20px) !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    flex-shrink: 0 !important;
+    gap: 0 !important;
+    text-align: center !important;
+}
+main.path-container .header h1 {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    text-align: center !important;
+    flex: 1 !important;
+    font-family: "M PLUS Rounded 1c", sans-serif !important;
+    text-transform: capitalize !important;
+}
+main.path-container .header .stats {
+    position: absolute !important;
+    right: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: transparent !important;
+    border: 1px solid #4E5669 !important;
+    padding: 4px 12px !important;
+    border-radius: 20px !important;
+    font-size: 0.75rem !important;
+    color: #8792A4 !important;
+    white-space: nowrap !important;
+    width: auto !important;
+    margin: 0 !important;
+    display: inline-block !important;
+}
+main.path-container .header .badges-link { display: none !important; }
+
+/* ============================================
+   CALCULATOR STEPS
    ============================================ */
 
 .step3, .step2, .step1 {
@@ -612,8 +783,16 @@ footer {
     border-radius: 2vh;
     width: 20vh;
     padding: 2vh;
+    cursor: pointer;
+    text-align: center;
+    pointer-events: auto;
+    position: relative;
+    z-index: 1;
+    transition: background-color 0.15s ease;
 }
-
+.step3 .suivant:hover, .step2 .suivant:hover, .step1 .suivant:hover {
+    background-color: #e0502a;
+}
 .step1 .choices button {
     display: flex;
     justify-content: center;
@@ -627,8 +806,17 @@ footer {
     width: 20vh;
     margin-bottom: 2vh;
     border-radius: 2vh;
+    pointer-events: auto;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
-
+.step1 .choices button:hover {
+    background-color: #4a5060 !important;
+}
+.step1 .choices button.selected {
+    border: 3px solid #22c55e !important;
+    background-color: rgba(34, 197, 94, 0.15) !important;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+}
 .step2 .choices button {
     display: flex;
     justify-content: center;
@@ -642,10 +830,18 @@ footer {
     width: 20vh;
     margin-bottom: 2vh;
     border-radius: 2vh;
+    pointer-events: auto;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
-.step2 .disparait {
-    display: none;
+.step2 .choices button:hover {
+    background-color: #4a5060 !important;
 }
+.step2 .choices button.selected {
+    border: 3px solid #22c55e !important;
+    background-color: rgba(34, 197, 94, 0.15) !important;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+}
+.step2 .disparait { display: none; }
 .step2 .inpuuut {
     display: flex;
     justify-content: center;
@@ -653,9 +849,7 @@ footer {
     flex-direction: column;
     margin-bottom: 3vh;
 }
-.step2 .inpuuut label {
-    margin-bottom: 2vh;
-}
+.step2 .inpuuut label { margin-bottom: 2vh; }
 .step2 .inpuuut input {
     background-color: #373E4E;
     border-radius: 1vh;
@@ -664,11 +858,7 @@ footer {
     color: #ffffff;
     border: 2px solid #657084;
 }
-.step2 .inpuuut input:focus {
-    outline: none;
-    border: 3px solid #ffffff;
-}
-
+.step2 .inpuuut input:focus { outline: none; border: 3px solid #ffffff; }
 .step3 .choices button {
     display: flex;
     justify-content: center;
@@ -682,7 +872,50 @@ footer {
     width: 20vh;
     margin-bottom: 2vh;
     border-radius: 2vh;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
-.step3 .suivant {
-    display: none;
+.step3 .choices button:hover {
+    background-color: #4a5060 !important;
+}
+.step3 .choices button.selected {
+    border: 3px solid #22c55e !important;
+    background-color: rgba(34, 197, 94, 0.15) !important;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+}
+.step3 .suivant { display: none; }
+.step2-food, .step3-result, .step3-food-result { padding-bottom: 20vh; }
+
+/* ============================================
+   BADGES PAGE
+   ============================================ */
+
+.badges-page {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px 200px;
+    background-color: #222631;
+    color: #ffffff;
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    box-sizing: border-box;
+}
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+}
+
+/* Ensure specific h1 inheritance */
+h1 {
+    color: #ffffff !important;
+}
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes profileFadeDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }

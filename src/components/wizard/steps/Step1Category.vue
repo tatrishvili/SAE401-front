@@ -42,12 +42,14 @@ const handleNext = () => {
 </script>
 
 <style scoped>
-button.selected {
-  background: #8792A4;
-  color: #373E4E;
-  border-color: #8792A4;
-}
 button {
   cursor: pointer;
+}
+
+button.selected {
+  border: 3px solid #22c55e !important;
+  background-color: rgba(34, 197, 94, 0.15) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
 }
 </style>

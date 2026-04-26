@@ -27,7 +27,6 @@
       />
     </div>
 
-
     <div v-if="loading" class="loading">⏳ Chargement...</div>
     <div v-else-if="apiError" class="error">{{ apiError }}</div>
 
@@ -89,7 +88,6 @@ const selectedItems = ref(props.data.selectedFoods ?? [])
 const validationError = ref('')
 
 const VIANDES_SLUGS = ['viandes', 'poissons']
-
 const FRUITS_SLUGS = ['fruits', 'cereales']
 
 const slugToName = (slug) => {
@@ -131,7 +129,7 @@ const fetchAlimentation = async () => {
           name: slugToName(item.slug),
           ecv: item.ecv,
           slug: item.slug,
-          groupSlug: group.slug,   // e.g. "viandes", "poissons", "plats", "encas"...
+          groupSlug: group.slug,
           isViande: VIANDES_SLUGS.includes(group.slug),
           isFruit: FRUITS_SLUGS.includes(group.slug),
         }))
@@ -163,7 +161,6 @@ const filteredItems = computed(() => {
 
   if (activeTab.value === 'viandes') {
     items = alimentationItems.value.filter(i => i.isViande)
-
   } else if (activeTab.value === 'fruitsetlegumes') {
     const combined = [
       ...fvItems.value,
@@ -175,11 +172,9 @@ const filteredItems = computed(() => {
       seen.add(i.slug)
       return true
     })
-
   } else if (activeTab.value === 'autres') {
     items = alimentationItems.value.filter(i => !i.isViande && !i.isFruit)
   }
-
 
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.toLowerCase().trim()
@@ -214,15 +209,17 @@ const handleNext = () => {
 
 <style scoped lang="scss">
 .step2-food {
-  padding: 1rem;
+  /* ✅ big bottom padding so content clears the footer */
+  padding: 1rem 1rem 25vh 1rem;
 
   h2 { margin-bottom: 0.25rem; color: white; }
 
   .subtitle {
-    color: #666;
+    color: #8792A4;
     font-size: 0.9rem;
     margin-bottom: 1rem;
   }
+
   .main-tabs {
     display: flex;
     gap: 0.5rem;
@@ -232,13 +229,20 @@ const handleNext = () => {
       flex: 1;
       padding: 0.6rem 0.25rem;
       border-radius: 0.5rem;
-      border: 1px solid #e5e7eb;
-      background: white;
-      color: #374151;
+      border: 1px solid #4E5669;
+      background: #373E4E;
+      color: #8792A4;
       font-size: 0.82rem;
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 600;
       white-space: nowrap;
+      transition: background 0.15s ease;
+
+      &:hover {
+        background: #e0502a;
+        color: white;
+        border-color: #e0502a;
+      }
 
       &.active {
         background: #22c55e;
@@ -254,12 +258,15 @@ const handleNext = () => {
     input {
       width: 100%;
       padding: 0.6rem 0.75rem;
-      border: 1px solid #d1d5db;
+      border: 1px solid #4E5669;
       border-radius: 0.5rem;
       font-size: 0.9rem;
       box-sizing: border-box;
-      color: #111827;
-      background: white;
+      color: #ffffff;
+      background: #373E4E;
+      font-family: "M PLUS Rounded 1c", sans-serif;
+
+      &::placeholder { color: #657084; }
 
       &:focus {
         outline: none;
@@ -272,14 +279,16 @@ const handleNext = () => {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-    max-height: 38vh;
+    /* ✅ tall enough to show items without cutting off */
+    max-height: 45vh;
     overflow-y: auto;
     margin-bottom: 0.75rem;
+    -webkit-overflow-scrolling: touch;
 
     .empty {
       text-align: center;
       padding: 2rem;
-      color: #999;
+      color: #8792A4;
       font-size: 0.9rem;
     }
 
@@ -288,30 +297,35 @@ const handleNext = () => {
       align-items: center;
       justify-content: space-between;
       padding: 0.65rem 0.75rem;
-      border: 1px solid #e5e7eb;
+      border: 1px solid #4E5669;
       border-radius: 0.5rem;
-      background: white;
-      color: #111827;
+      background: #373E4E;
+      color: #ffffff;
       cursor: pointer;
       text-align: left;
       gap: 0.5rem;
+      transition: background 0.15s ease, border-color 0.15s ease;
+
+      &:hover {
+        background: #4a5060;
+      }
 
       &.selected {
-        border-color: #22c55e;
-        background: #f0fdf4;
-        color: #111827;
+        border: 2px solid #22c55e;
+        background: rgba(34, 197, 94, 0.15);
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
       }
 
       .food-name {
-        font-weight: 500;
+        font-weight: 600;
         font-size: 0.9rem;
         flex: 1;
-        color: #111827;
+        color: #ffffff;
       }
 
       .food-co2 {
         font-size: 0.72rem;
-        color: #9ca3af;
+        color: #8792A4;
         white-space: nowrap;
       }
 
@@ -323,14 +337,15 @@ const handleNext = () => {
   }
 
   .selected-summary {
-    background: #f9fafb;
+    background: #2a3242;
+    border: 1px solid #4E5669;
     border-radius: 0.5rem;
     padding: 0.75rem;
     margin-bottom: 0.75rem;
 
     h3 {
       font-size: 0.85rem;
-      color: #555;
+      color: #c8d0da;
       margin-bottom: 0.5rem;
     }
 
@@ -352,14 +367,14 @@ const handleNext = () => {
   }
 
   .error-msg {
-    color: #ef4444;
+    color: #F96750;
     font-size: 0.85rem;
     margin-bottom: 0.5rem;
     display: block;
   }
 
-  .error { color: #ef4444; font-size: 0.85rem; }
-  .loading { text-align: center; padding: 2rem; color: #666; }
+  .error { color: #F96750; font-size: 0.85rem; }
+  .loading { text-align: center; padding: 2rem; color: #8792A4; }
 
   .actions {
     display: flex;
@@ -373,11 +388,25 @@ const handleNext = () => {
       border: none;
       cursor: pointer;
       font-size: 1rem;
-      font-weight: 500;
+      font-weight: 600;
+      transition: background 0.15s ease;
     }
 
-    .btn-back { background: #f3f4f6; color: #374151; }
-    .btn-next { background: #22c55e; color: white; }
+    .btn-back {
+      background: #373E4E;
+      color: #8792A4;
+      border: 1px solid #4E5669;
+
+      &:hover { background: #4E5669; color: #ffffff; }
+    }
+
+    .btn-next {
+      background: #22c55e;
+      color: white;
+      border-bottom: 3px solid #16a34a;
+
+      &:hover { background: #16a34a; }
+    }
   }
 }
 </style>

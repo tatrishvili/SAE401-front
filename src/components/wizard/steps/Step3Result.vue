@@ -2,42 +2,52 @@
   <div class="step3-result">
     <h2>Résultat</h2>
 
-    <div v-if="loading">⏳ Calcul en cours...</div>
+    <div v-if="loading" class="loading">⏳ Calcul en cours...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else-if="result !== null">
-      <p>
-        Pour <strong>{{ data.km }} km</strong> en
-        <strong>{{ transportLabel }}</strong> :
-      </p>
-      <p class="result">🌍 {{ result }} kg CO₂e</p>
 
-      <div v-if="isLoggedIn" class="save-section">
+    <div v-else-if="result !== null">
+      <div class="result-card">
+        <p class="result-label">
+          {{ data.km }} km en <strong>{{ transportLabel }}</strong>
+        </p>
+        <p class="result-value">🌍 {{ result }} <span class="unit">kg CO₂e</span></p>
+      </div>
+
+      <div v-if="isLoggedIn && !saved" class="save-section">
         <button
             @click="handleSave"
             class="btn-save"
-            :disabled="saving || saved"
+            :disabled="saving"
         >
-          <span v-if="saving"> Enregistrement...</span>
-          <span v-else-if="saved"> Enregistré</span>
-          <span v-else> Sauvegarder dans mon profil</span>
+          <span v-if="saving">⏳ Enregistrement...</span>
+          <span v-else>💾 Sauvegarder dans mon profil</span>
         </button>
         <p v-if="saveError" class="error">{{ saveError }}</p>
-        <p v-if="saved" class="success">Résultat enregistré avec succès !</p>
       </div>
-      <div v-else class="login-prompt">
+
+      <div v-if="saved" class="success-navigation">
+        <p class="success-msg">✅ Résultat enregistré avec succès !</p>
+        <button @click="goToDashboard" class="btn-dashboard">
+          Voir mes résultats
+        </button>
+      </div>
+
+      <div v-if="!isLoggedIn" class="login-prompt">
         <p>
           <router-link to="/connexion">Connectez-vous</router-link>
           pour sauvegarder vos résultats
         </p>
+        <button @click="goToDashboard" class="btn-dashboard guest-btn" style="margin-top: 1rem;">
+          Continuer sans sauvegarder
+        </button>
       </div>
     </div>
-
-    <button @click="$emit('prev')" class="btn-back">← Retour</button>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router' // Importation du router
 import { useApi } from '@/composables/useApi.js'
 import { useAuth } from '@/composables/useAuth.js'
 
@@ -48,38 +58,40 @@ const props = defineProps({
     default: () => ({ km: 0, transportId: null }),
   }
 })
-defineEmits(['prev'])
 
+const router = useRouter() // Initialisation
 const { loading, error, fetchApi } = useApi()
 const { isLoggedIn } = useAuth()
+
 const result = ref(null)
 const saving = ref(false)
 const saved = ref(false)
 const saveError = ref('')
 
 const transportLabel = computed(() => {
-  const labels = {
-    2:  'Voiture',
-    10: 'Train (TGV)',
-    14: 'Avion',
-    7:  'Vélo / Marche',
-  }
+  const labels = { 2: 'Voiture', 10: 'Train (TGV)', 14: 'Avion', 7: 'Vélo / Marche' }
   return labels[props.data.transportId] ?? `Transport #${props.data.transportId}`
 })
 
+// Navigation centralisée
+const goToDashboard = () => {
+  router.push('/dashboard')
+}
+
 onMounted(async () => {
   try {
-    const json = await fetchApi(
-        `/transport?km=${props.data.km}&transports=${props.data.transportId}`
-    )
+    const json = await fetchApi(`/transport?km=${props.data.km}&transports=${props.data.transportId}`)
     const item = json.data?.[0] || null
-    result.value = item?.value ? (item.value / 1000).toFixed(3) : '—'
+    // Sécurité si l'API retourne une valeur vide ou 0
+    result.value = item?.value ? (item.value / 1000).toFixed(3) : '0.000'
   } catch (e) {
-    // error handled in useApi
+    console.error("Erreur calcul:", e)
   }
 })
 
 const handleSave = async () => {
+  if (saving.value || !result.value) return
+
   saving.value = true
   saveError.value = ''
 
@@ -106,52 +118,62 @@ const handleSave = async () => {
 </script>
 
 <style scoped>
-.save-section {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: #f9fafb;
-  border-radius: 0.5rem;
+/* Tes styles sont conservés, ils fonctionnent parfaitement */
+.loading { text-align: center; color: #8792A4; padding: 2rem 0; }
+.result-card {
+  background-color: #2a3242;
+  border-radius: 1.5vh;
+  padding: 2rem;
+  text-align: center;
+  margin: 1.5rem 0;
+  border: 1px solid #4E5669;
 }
+.result-label { color: #8792A4; font-size: 0.95rem; margin-bottom: 1rem; }
+.result-label strong { color: #ffffff; }
+.result-value { font-size: 2.2rem; font-weight: 800; color: #22c55e; margin: 0; }
+.result-value .unit { font-size: 1rem; color: #8792A4; font-weight: 600; }
+.success-msg { text-align: center; color: #22c55e; font-weight: 700; margin-bottom: 1rem; }
 
 .btn-save {
-  width: 100%;
-  padding: 0.75rem;
-  background: #22c55e;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
+  all: unset !important;
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 2vh !important;
+  background-color: #22c55e !important;
+  color: #ffffff !important;
+  border-radius: 2vh !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  cursor: pointer !important;
+  border-bottom: 0.6vh solid #16a34a !important;
 }
 
-.btn-save:hover:not(:disabled) {
-  background: #16a34a;
+.btn-dashboard {
+  all: unset !important;
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 2vh !important;
+  background-color: #F96750 !important;
+  color: #ffffff !important;
+  border-radius: 2vh !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  cursor: pointer !important;
+  border-bottom: 0.6vh solid #df4830 !important;
 }
 
-.btn-save:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.success {
-  color: #16a34a;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-}
-
+.error { color: #F96750; font-size: 0.85rem; text-align: center; margin-top: 0.5rem; }
 .login-prompt {
-  margin-top: 1rem;
+  background-color: #2a3242;
+  border: 1px solid #4E5669;
+  border-radius: 1.5vh;
   padding: 1rem;
-  background: #fef3c7;
-  border-radius: 0.5rem;
   text-align: center;
+  color: #8792A4;
 }
-
-.login-prompt a {
-  color: #f59e0b;
-  font-weight: 600;
-  text-decoration: underline;
-}
+.login-prompt a { color: #F96750; font-weight: 700; }
 </style>

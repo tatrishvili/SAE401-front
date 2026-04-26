@@ -1,46 +1,57 @@
 <template>
   <main class="badges-page">
-    <header class="badges-header">
-      <button class="back-btn" @click="$router.push('/challenges')">
-        Retour
+
+    <!-- Header matching global style -->
+    <header>
+      <button class="retour back-btn" @click="$router.push('/challenges')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
       </button>
-      <div>
-        <h1>Galerie des Trophées</h1>
-        <p>Débloque des badges en progressant dans ton parcours éco.</p>
-      </div>
+      <h1>Galerie des Trophées</h1>
     </header>
 
+    <!-- XP Bar -->
     <XpDisplay :xp="xp" :next-threshold="nextBadgeThreshold" />
 
+    <!-- Subtitle -->
+    <p class="page-subtitle">Débloque des badges en progressant dans ton parcours éco.</p>
+
+    <!-- Loading / Error -->
+    <p v-if="loading" class="status-text">Chargement des trophées...</p>
+    <p v-if="errorMessage" class="status-text error">{{ errorMessage }}</p>
+
+    <!-- Badges grid -->
     <section class="badges-grid" v-if="displayedBadges.length > 0">
       <article
-        v-for="(badge, index) in displayedBadges"
-        :key="badge.id"
-        class="badge-card"
-        :class="{
+          v-for="(badge, index) in displayedBadges"
+          :key="badge.id"
+          class="badge-card"
+          :class="{
           locked: !isUnlocked(badge.id),
           unlocked: isUnlocked(badge.id),
         }"
       >
-        <span class="xp-threshold">{{ badge.xpRequired }} XP</span>
-        <div class="badge-visual" :title="badge.name">
+        <span class="xp-pill">{{ badge.xpRequired }} XP</span>
+
+        <div class="badge-visual">
           <img
-            class="badge-photo"
-            :class="{
+              class="badge-photo"
+              :class="{
               unlocked: isUnlocked(badge.id),
               locked: !isUnlocked(badge.id),
             }"
-            :src="resolveBadgeImage(badge, index)"
-            :alt="badge.name"
+              :src="resolveBadgeImage(badge, index)"
+              :alt="badge.name"
           />
+          <div v-if="!isUnlocked(badge.id)" class="lock-icon">🔒</div>
         </div>
+
         <h2>{{ badge.name }}</h2>
         <p>{{ badge.description }}</p>
       </article>
     </section>
 
-    <p v-if="loading" class="status-text">Chargement des trophées...</p>
-    <p v-if="errorMessage" class="status-text error">{{ errorMessage }}</p>
   </main>
 </template>
 
@@ -56,9 +67,9 @@ import {
 } from "@/services/badges";
 
 const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.VITE_API_URL ||
-  "http://127.0.0.1:8000/api";
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    "http://127.0.0.1:8000/api";
 const BADGE_SEEN_KEY = "seenUnlockedBadgesCount";
 
 const xp = ref(0);
@@ -78,7 +89,7 @@ const toValidNumber = (...values) => {
 
 const displayedBadges = computed(() => {
   const earnedMap = new Map(
-    normalizeBadgesArray(earnedBadges.value).map((badge) => [badge.id, badge]),
+      normalizeBadgesArray(earnedBadges.value).map((badge) => [badge.id, badge]),
   );
   const catalog = normalizeBadgesArray(badgesCatalog.value);
   const merged = catalog.map((badge) => {
@@ -94,32 +105,31 @@ const displayedBadges = computed(() => {
 
 const unlockedIds = computed(() => {
   const unlockedFromApi = normalizeBadgesArray(earnedBadges.value).map(
-    (badge) => badge.id,
+      (badge) => badge.id,
   );
   const unlockedFromXp = getUnlockedBadgesFromXp(xp.value)
-    .filter((badge) => badge.xpRequired > 0)
-    .map((badge) => badge.id);
+      .filter((badge) => badge.xpRequired > 0)
+      .map((badge) => badge.id);
   return new Set([...unlockedFromApi, ...unlockedFromXp]);
 });
+
 const isUnlocked = (badgeId) =>
-  unlockedIds.value.has(String(badgeId).toLowerCase());
+    unlockedIds.value.has(String(badgeId).toLowerCase());
+
 const unlockedCount = computed(
-  () => displayedBadges.value.filter((badge) => isUnlocked(badge.id)).length,
+    () => displayedBadges.value.filter((badge) => isUnlocked(badge.id)).length,
 );
 
 const computeNextThreshold = (data) => {
   const directThreshold = Number(
-    data?.nextBadgeXp ??
-      data?.nextBadgeThreshold ??
-      data?.nextThreshold ??
-      data?.next_badge_xp ??
-      data?.progress?.nextBadgeXp,
+      data?.nextBadgeXp ?? data?.nextBadgeThreshold ?? data?.nextThreshold ??
+      data?.next_badge_xp ?? data?.progress?.nextBadgeXp,
   );
   if (Number.isFinite(directThreshold) && directThreshold > 0)
     return directThreshold;
   const fromCatalog = displayedBadges.value
-    .filter((badge) => !isUnlocked(badge.id) && badge.xpRequired > xp.value)
-    .sort((a, b) => a.xpRequired - b.xpRequired)[0];
+      .filter((badge) => !isUnlocked(badge.id) && badge.xpRequired > xp.value)
+      .sort((a, b) => a.xpRequired - b.xpRequired)[0];
   return fromCatalog ? fromCatalog.xpRequired : Math.max(100, xp.value + 100);
 };
 
@@ -133,10 +143,8 @@ const fetchStepsXpFallback = async (token) => {
   if (!stepsResponse.ok) return false;
   const stepsPayload = await stepsResponse.json();
   const steps = Array.isArray(stepsPayload?.data)
-    ? stepsPayload.data
-    : Array.isArray(stepsPayload)
-      ? stepsPayload
-      : [];
+      ? stepsPayload.data
+      : Array.isArray(stepsPayload) ? stepsPayload : [];
   const completedCount = steps.filter((step) => step?.isCompleted).length;
   xp.value = mergeXpWithLocal(completedCount * 25);
   return true;
@@ -145,8 +153,7 @@ const fetchStepsXpFallback = async (token) => {
 const fetchStats = async () => {
   loading.value = true;
   errorMessage.value = "";
-  const token =
-    localStorage.getItem("token") || localStorage.getItem("auth_token");
+  const token = localStorage.getItem("token") || localStorage.getItem("auth_token");
   try {
     const response = await fetch(`${API_BASE}/me/stats`, {
       headers: {
@@ -158,25 +165,15 @@ const fetchStats = async () => {
       const payload = await response.json();
       const data = payload?.data ?? payload;
       const xpFromApi = toValidNumber(
-        data?.xp,
-        data?.totalXp,
-        data?.xpTotal,
-        data?.experience,
-        data?.experienceTotal,
-        data?.points,
-        data?.progress?.xp,
-        data?.progress?.totalXp,
-        payload?.xp,
-        payload?.totalXp,
+          data?.xp, data?.totalXp, data?.xpTotal, data?.experience,
+          data?.experienceTotal, data?.points, data?.progress?.xp,
+          data?.progress?.totalXp, payload?.xp, payload?.totalXp,
       );
       xp.value = mergeXpWithLocal(xpFromApi ?? 0);
       earnedBadges.value = Array.isArray(data?.badges) ? data.badges : [];
       const catalogFromApi =
-        data?.allBadges ??
-        data?.badgesCatalog ??
-        data?.availableBadges ??
-        data?.catalog ??
-        data?.badges_catalog;
+          data?.allBadges ?? data?.badgesCatalog ?? data?.availableBadges ??
+          data?.catalog ?? data?.badges_catalog;
       if (Array.isArray(catalogFromApi) && catalogFromApi.length > 0)
         badgesCatalog.value = normalizeBadgesArray(catalogFromApi);
       if (xpFromApi === null) await fetchStepsXpFallback(token);
@@ -187,16 +184,14 @@ const fetchStats = async () => {
       nextBadgeThreshold.value = computeNextThreshold({});
       localStorage.setItem(BADGE_SEEN_KEY, String(unlockedCount.value));
       if (!fallbackWorked)
-        errorMessage.value =
-          "Impossible de recuperer ta progression pour le moment.";
+        errorMessage.value = "Impossible de récupérer ta progression pour le moment.";
     }
   } catch {
     const fallbackWorked = await fetchStepsXpFallback(token);
     nextBadgeThreshold.value = computeNextThreshold({});
     localStorage.setItem(BADGE_SEEN_KEY, String(unlockedCount.value));
     if (!fallbackWorked)
-      errorMessage.value =
-        "Impossible de recuperer ta progression pour le moment.";
+      errorMessage.value = "Impossible de récupérer ta progression pour le moment.";
   } finally {
     loading.value = false;
   }
@@ -209,142 +204,192 @@ onMounted(fetchStats);
 @use "@/assets/variables" as v;
 
 .badges-page {
-  min-height: 100vh;
-  padding: 34px 18px 120px;
-  color: v.$l1;
-  background:
-    radial-gradient(circle at 5% 0%, rgba(v.$c1, 0.12), transparent 36%),
-    radial-gradient(circle at 92% 18%, rgba(v.$c2, 0.14), transparent 32%),
-    v.$d4;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 100px;
+  background-color: #222631;
+  color: #ffffff;
+  font-family: "M PLUS Rounded 1c", sans-serif;
 }
 
-.badges-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  flex-wrap: nowrap;
-  max-width: 1100px;
-  margin: 0 auto 20px;
+/* ── Header — matches global header style ── */
+header {
+  background-color: #373E4E !important;
+  height: 10vh !important;
+  min-height: 56px !important;
+  padding: 0 16px !important;
+  margin: 0 -16px 2vh -16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  width: calc(100% + 32px) !important;
+  box-sizing: border-box !important;
+
+  h1 {
+    margin: 0;
+    text-align: center;
+    flex: 1;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    text-transform: capitalize;
+    color: #ffffff;
+  }
 }
-.badges-header > div {
-  flex: 1 1 0;
-  min-width: 0;
-}
-.badges-header h1 {
-  margin: 0;
-  font-size: clamp(1.35rem, 2vw, 2rem);
-  line-height: 1.2;
-}
-.badges-header p {
-  margin: 6px 0 0;
-  color: v.$l5;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  line-height: 1.4;
-}
+
+/* ── Back button — override global button style ── */
 .back-btn {
-  border: 1px solid v.$d1;
-  background: rgba(v.$d3, 0.95);
-  color: v.$l1;
-  border-radius: 12px;
-  padding: 8px 14px;
-  cursor: pointer;
+  all: unset !important;
+  position: absolute !important;
+  left: 16px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 44px !important;
+  height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  color: #c8d0da !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: none !important;
+  border-right: none !important;
+  border-left: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: unset !important;
+
+  &:hover { color: #ffffff !important; }
+  &:active { border: none !important; }
+
+  svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    fill: none;
+  }
 }
+
+/* ── Page subtitle ── */
+.page-subtitle {
+  font-size: 14px;
+  color: #8792A4;
+  margin: 0 0 2vh;
+  text-align: center;
+}
+
+/* ── Badges grid ── */
 .badges-grid {
-  max-width: 1100px;
-  margin: 0 auto;
   display: grid;
   gap: 14px;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  margin-top: 2vh;
 }
+
 .badge-card {
   position: relative;
   padding: 16px;
   border-radius: 16px;
-  border: 1px solid rgba(v.$d1, 0.85);
-  background: linear-gradient(180deg, rgba(v.$d3, 0.98), rgba(v.$d4, 0.94));
-  box-shadow: 0 12px 24px rgba(v.$d5, 0.22);
+  border: 1px solid #373E4E;
+  background-color: #2a3242;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+
+  &.unlocked {
+    border-color: rgba(#4CAF50, 0.4);
+  }
+
+  &.locked {
+    opacity: 0.75;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #8792A4;
+    line-height: 1.4;
+  }
 }
-.xp-threshold {
+
+/* ── XP pill ── */
+.xp-pill {
   position: absolute;
   top: 10px;
   right: 10px;
   border-radius: 999px;
-  padding: 4px 9px;
-  font-size: 0.72rem;
+  padding: 3px 8px;
+  font-size: 0.7rem;
   font-weight: 800;
-  background: rgba(v.$c2, 0.2);
-  color: v.$c2;
-  border: 1px solid rgba(v.$c2, 0.45);
-}
-.badge-visual {
-  position: relative;
-  width: 72px;
-  height: 72px;
-  margin-bottom: 12px;
-  border-radius: 50%;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 30% 28%, rgba(v.$l1, 0.24), transparent 26%),
-    rgba(v.$c1, 0.08);
-  border: 2px solid rgba(v.$c2, 0.62);
-}
-.badge-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transform: scale(1.02);
-  filter: grayscale(1) brightness(0.78) contrast(1.05);
-}
-.badge-photo.unlocked {
-  filter: none;
-}
-.badge-card.unlocked .badge-visual {
-  box-shadow:
-    0 0 0 6px rgba(v.$c1, 0.12),
-    inset 0 0 0 1px rgba(v.$l1, 0.04);
-}
-.badge-card.locked {
-  opacity: 0.86;
-}
-.badge-card h2 {
-  margin: 0 0 6px;
-  font-size: 1rem;
-}
-.badge-card p {
-  margin: 0;
-  color: v.$l5;
-  font-size: 0.88rem;
-  line-height: 1.45;
-}
-.status-text {
-  max-width: 1100px;
-  margin: 16px auto 0;
-  color: v.$l5;
-}
-.status-text.error {
-  color: v.$c2;
+  background: rgba(#F96750, 0.15);
+  color: #F96750;
+  border: 1px solid rgba(#F96750, 0.35);
 }
 
-@media (max-width: 640px) {
-  .badges-header {
-    flex-direction: column;
+/* ── Badge image ── */
+.badge-visual {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #373E4E;
+  border: 2px solid #4E5669;
+  flex-shrink: 0;
+
+  .badge-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(1) brightness(0.7);
+
+    &.unlocked {
+      filter: none;
+    }
+  }
+
+  .lock-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
     align-items: center;
-    text-align: center;
-    gap: 10px;
+    justify-content: center;
+    font-size: 1.2rem;
+    background: rgba(0, 0, 0, 0.3);
   }
-  .badges-header h1 {
-    font-size: 1.3rem;
-  }
-  .badges-header p {
-    font-size: 0.9rem;
-  }
-  .back-btn {
-    align-self: flex-start;
-  }
+}
+
+.badge-card.unlocked .badge-visual {
+  border-color: rgba(#4CAF50, 0.6);
+}
+
+/* ── Status text ── */
+.status-text {
+  text-align: center;
+  color: #8792A4;
+  font-size: 0.9rem;
+  margin: 16px 0;
+
+  &.error { color: #F96750; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 400px) {
   .badges-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 10px;
   }
 }
