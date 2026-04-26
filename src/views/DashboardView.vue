@@ -11,7 +11,6 @@
       <h1 class="title">Tableau de bord</h1>
     </div>
 
-    <!-- Score du jour -->
     <div class="card">
       <p class="card-title">Score du jour</p>
       <apexchart
